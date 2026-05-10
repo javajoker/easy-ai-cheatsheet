@@ -409,7 +409,7 @@ Use `present_files` to deliver.
 ## Workflow Position
 
 ```
-prototype → docs → mockup → task-breakdown → [YOU ARE HERE]  +  project-backend
+prototype → docs → mockup → task-breakdown → [YOU ARE HERE]  +  project-backend-{node|go|python}
                                               project-frontend
 ```
 
@@ -419,4 +419,6 @@ Final summary:
 > Run `pnpm install && pnpm dev`. Toggle `VITE_USE_MOCK=true` for offline mode.
 > Each `src/features/{task-id-slug}/` folder links back to its source task file —
 > when you work on a task, the corresponding code folder is already in place.
-> Pair with the **project-backend** skill running in parallel."
+> Pair with the **project-backend-node**, **project-backend-go**, or
+> **project-backend-python** skill running in parallel — pick the one matching
+> the language chosen in TECH_DESIGN.md."

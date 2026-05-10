@@ -1,26 +1,21 @@
 ---
-name: project-backend
+name: project-backend-node
 description: >
-  Generates a production-grade backend application from project docs (PRD + tech design)
-  AND the task breakdown produced by the task-breakdown skill. Output includes i18n
-  (English + Traditional Chinese error messages by default), a service organisation
-  aligned with the task-breakdown backend components (so each task ID maps to a real
-  service folder), every API endpoint specified in the tech design, database schema
-  migrations, authentication, role-based authorisation, background workers, and external
-  integrations. Output is a complete runnable Node.js/TypeScript project saved as a
-  tar archive.
+  Generates a production-grade Node.js/TypeScript backend application from project docs
+  (PRD + tech design) AND the task breakdown. Output is a Fastify + Prisma + PostgreSQL
+  + Redis + BullMQ project with i18n (English + Traditional Chinese error messages),
+  service organisation aligned with task-breakdown backend components (each task ID
+  maps to a real module folder), every API endpoint from the tech design, database
+  migrations, JWT auth + RBAC, background workers, and external integrations.
 
-  USE THIS SKILL whenever the user has:
-  - completed PRD + tech design AND task breakdown, and wants the production backend code
-  - asks to "build the backend", "create the API server", "scaffold the Node.js project"
-  - wants every endpoint from the tech design implemented end-to-end with code organised
-    by task IDs
-  - is at Phase 5 of the project-quick-start workflow (parallel with project-frontend)
-  - says "I'm ready for the production backend now" or "build the API from the docs and
-    task plan"
-  Trigger this whenever a backend codebase is needed for an existing tech design — even
-  if only tech design is attached without a task plan, this skill can run with a prompt
-  to first run task-breakdown.
+  USE THIS SKILL when the user wants a Node.js backend specifically. Trigger when:
+  - the tech design specifies Node.js / TypeScript / Fastify / Express / NestJS as the
+    backend stack
+  - the user explicitly asks for "Node backend", "TypeScript API", "JavaScript backend"
+  - the user says "build the backend" without specifying a language AND the tech design
+    is silent on stack choice (Node.js is the default)
+  Do NOT trigger this skill if the tech design specifies Go or Python — use
+  project-backend-go or project-backend-python respectively.
 ---
 
 # Project Backend Generator

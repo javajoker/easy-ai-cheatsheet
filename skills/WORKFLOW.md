@@ -6,13 +6,16 @@ The full sequence:
 
 ```
 [1] prototype  →  [2] docs  →  [3] mockup (optional)  →  [4] task-breakdown
-                                                                 │
-                                                                 ▼
-                                                       [5a] frontend  ║
-                                                       [5b] backend   ║  parallel
-                                                                      ║  (both consume
-                                                                          docs + tasks)
+                   (asks backend                                 │
+                    language)                                    ▼
+                                                       [5a] frontend         ║
+                                                       [5b] backend-{node,   ║  parallel
+                                                            go, or python}   ║  (both consume
+                                                                                docs + tasks)
 ```
+
+The backend language is chosen during Phase 2 (`project-docs`) and baked into
+TECH_DESIGN.md. Phase 5b uses whichever backend skill matches that choice.
 
 ---
 
@@ -74,11 +77,23 @@ Convert the prototype + idea into formal docs that engineering can build from.
 - The original idea description (in case it got refined during Phase 1)
 - Any constraints: tech stack preferences, scale targets, integrations
 
+### Backend Language Decision
+`project-docs` will ask which backend language you want before generating TECH_DESIGN.md:
+
+> "Which backend language would you like?
+> - **Node.js / TypeScript** (default, fastest dev velocity)
+> - **Go** (best latency at minimal compute cost)
+> - **Python** (FastAPI; best for ML/data integration)"
+
+The choice is baked into TECH_DESIGN.md and determines which backend skill you'll
+use in Phase 5b.
+
 ### What you get
 Three markdown files in `/mnt/user-data/outputs/`:
 - **PRD.md** — personas, user stories, features (P0/P1/P2), business rules, success metrics
 - **UIUX_SPEC.md** — every view spec, components, flows, missing views identified
-- **TECH_DESIGN.md** — DB schema, every API endpoint, auth, i18n, security, deployment
+- **TECH_DESIGN.md** — DB schema, every API endpoint, auth, **stack-specific i18n
+  approach**, security, deployment — language-specific library choices embedded
 
 ### Quality check
 The skill enforces cross-doc consistency, but spot-check before moving on:
@@ -233,41 +248,61 @@ pnpm install
 pnpm dev    # uses real backend if available, mock if VITE_USE_MOCK=true
 ```
 
-### Phase 5b — Backend (`project-backend`)
+### Phase 5b — Backend (`project-backend-node` / `-go` / `-python`)
+
+Pick the skill matching the language chosen in TECH_DESIGN.md:
+
+| Language | Skill | Output structure |
+|----------|-------|------------------|
+| Node.js | `project-backend-node` | `src/modules/{task-id-slug}/` (kebab) |
+| Go | `project-backend-go` | `internal/modules/{task_id_slug}/` (lowercase) |
+| Python | `project-backend-python` | `app/modules/{task_id_slug}/` (snake_case) |
 
 #### Prompts
 ```
-"Build the production backend, organised around the task breakdown."
+"Build the production Node.js backend, organised around the task breakdown."
 ```
 ```
-"Generate the Node.js backend using the docs and task plan."
+"Generate the Go backend using the docs and task plan."
+```
+```
+"Build the Python FastAPI backend from the docs and task breakdown."
+```
+```
+"Build the backend"     # → routes to the language in TECH_DESIGN.md
 ```
 
 #### Inputs to provide
 - PRD.md, TECH_DESIGN.md (UIUX_SPEC optional but useful)
 - The task-breakdown tar (or its extracted contents)
 
-#### What you get
-- Node.js + Fastify + TypeScript
-- Prisma + PostgreSQL with full schema and migrations
-- Redis + BullMQ for queues
-- Every endpoint from TECH_DESIGN with Zod validation, RBAC, i18n errors,
-  integration tests
+#### What you get (all three variants share this structure)
+- Production-grade backend in your chosen language
+- PostgreSQL schema migrations (Prisma / golang-migrate / Alembic)
+- Redis-backed job queue (BullMQ / asynq / Celery)
+- Every endpoint from TECH_DESIGN with validation, RBAC, i18n errors, tests
 - JWT auth (RS256) with refresh token rotation
 - Background workers (email, file processing, notifications)
 - External integrations (Stripe, SendGrid, S3, etc.)
-- Auto-generated Swagger UI at /docs
+- Auto-generated OpenAPI / Swagger
 - Docker + docker-compose for local dev
-- **Service organisation aligned with task-breakdown backend components**
-  (e.g. each backend task ID like `BE-003 Auth Service` maps to its own service folder)
+- **Module organisation aligned with task-breakdown backend components**
+  (e.g. each backend task ID like `BE-003 Auth Service` maps to its own module folder)
+
+Setup commands:
 
 ```bash
-tar -xzf {project}-backend.tar.gz
-cd {project}-backend
-docker-compose up -d   # postgres + redis
-pnpm install
-pnpm prisma migrate dev
-pnpm dev               # API on :3000, Swagger at /docs
+# Node.js variant
+tar -xzf {project}-backend-node.tar.gz && cd {project}-backend-node
+docker-compose up -d && pnpm install && pnpm prisma migrate dev && pnpm dev
+
+# Go variant
+tar -xzf {project}-backend-go.tar.gz && cd {project}-backend-go
+docker-compose up -d && make migrate && make seed && make dev
+
+# Python variant
+tar -xzf {project}-backend-py.tar.gz && cd {project}-backend-py
+docker-compose up -d && poetry install && make migrate && make seed && make dev
 ```
 
 ### Phase 5c — Connect frontend to backend
@@ -321,6 +356,10 @@ TECH_DESIGN.md.
 
 4. **Run task-breakdown after the mockup, not before.** Mockup feedback often refines
    the docs; you want the task plan to reflect the latest version.
+
+5. **Choose backend language before generating docs.** Once TECH_DESIGN.md is generated
+   with a specific stack, switching language means regenerating the doc. The mockup app
+   and frontend are unaffected by backend language — only the backend skill changes.
 
 5. **Run frontend and backend generation in parallel conversations.** They share the
    tech design + task plan as the contract; no need to serialize.

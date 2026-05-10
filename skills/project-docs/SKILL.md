@@ -43,12 +43,35 @@ together, never separately, to keep them consistent.
 Required:
 - [ ] Original project idea description (concept, goals, constraints)
 - [ ] UI prototype (HTML/React file, screenshots, or detailed description)
+- [ ] **Backend language choice** (Node.js / Go / Python — see below)
 
 Optional but very helpful:
-- [ ] Tech stack preference (if user has one)
+- [ ] Frontend stack preference (defaults to React + Vite + TS)
 - [ ] Target users/scale (10 users vs 1M users changes a lot)
 - [ ] Integration requirements (specific APIs, blockchains, payment processors)
 - [ ] Compliance constraints (GDPR, HIPAA, financial regs)
+
+### Backend Language Decision
+
+If the user has not specified a backend language, ASK ONCE before generating
+TECH_DESIGN.md:
+
+> "Which backend language would you like? Three options:
+> - **Node.js / TypeScript** (default, fastest dev velocity, full TS sharing with frontend)
+> - **Go** (best p95 latency at minimal cost, strong concurrency model)
+> - **Python** (FastAPI; pick this if you need ML / data-science integration)"
+
+Once chosen, this drives:
+- The "Backend stack" header at the top of TECH_DESIGN.md
+- Which Backend stack table is included (Option A/B/C in tech-design-template.md)
+- The library choices for queue, ORM, validation, JWT, i18n throughout the doc
+- The downstream skill that gets recommended:
+  - Node.js → `project-backend-node`
+  - Go → `project-backend-go`
+  - Python → `project-backend-python`
+
+Document the chosen language explicitly in TECH_DESIGN.md section 2.2 — only include
+the matching block, not all three.
 
 If the prototype is a React artifact from a previous turn, parse it directly — extract
 view names, mock data structures, and visible flows. Do not re-ask the user for things
@@ -177,15 +200,16 @@ Final summary message to user:
 > "Three documents generated:
 > - PRD.md — N personas, N user stories, N features (P0: x, P1: y, P2: z)
 > - UIUX_SPEC.md — N views including N new ones not in the original prototype
-> - TECH_DESIGN.md — N database tables, N API endpoints
+> - TECH_DESIGN.md — N database tables, N API endpoints, backend stack: {chosen language}
 >
 > **Recommended next step**: run **project-mockup-app** for a quick runnable demo
 > with mock data. Validate the docs end-to-end by clicking through every flow.
 > If you find spec gaps, come back here and update the docs.
 >
 > When the docs are validated, run **task-breakdown** to generate the AI-executable
-> task plan. Then run **project-frontend** + **project-backend** in parallel — both
-> consume the docs AND the task plan, producing code organised around task IDs."
+> task plan. Then run **project-frontend** + **project-backend-{node|go|python}** in
+> parallel — both consume the docs AND the task plan, producing code organised around
+> task IDs."
 
 ---
 
