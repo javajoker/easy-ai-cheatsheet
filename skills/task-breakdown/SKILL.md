@@ -8,6 +8,17 @@ description: >
   individual task files per component — each with YAML frontmatter, context, grouped
   task checklists, an AI execution prompt, expected outputs, and a verification checklist.
   Output is packaged as a downloadable tar archive.
+
+  USE THIS SKILL whenever the user asks to:
+  - "break down tasks for this project"
+  - "create a task plan / task list / work breakdown"
+  - "generate dev tasks from this PRD / spec / doc"
+  - "create an AI-friendly project plan"
+  - "make task markdown files for this project"
+  - "help me plan this project with task files"
+  - upload a PRD, technical design, whitepaper, or architecture doc and ask what to build
+  - ask for a project roadmap, sprint plan, or implementation schedule as markdown
+  Even if the user only says "help me plan this" with a document attached — use this skill.
 ---
 
 # Task Breakdown Generator Skill
@@ -297,6 +308,26 @@ Adjust task granularity based on team size and timeline:
 | 5+ devs | 20+ weeks | One file per sub-component, groups = 1-day sprints |
 
 When in doubt: **more granular is better for AI execution** (easier to verify and check off).
+
+---
+
+## Workflow Position
+
+```
+prototype → docs → mockup (optional) → [YOU ARE HERE] → frontend + backend
+                                       task-breakdown    (both consume docs
+                                                          AND this task plan)
+```
+
+After delivering the tar, end with this hand-off message:
+
+> "Task plan generated: N components, N tasks, N estimated hours.
+> Top 3 unblocked tasks to start: {list}.
+>
+> When ready for code: run **project-frontend** and **project-backend** in parallel.
+> Both will consume the project docs AND this task plan — the generated code
+> structure (folders, modules, features) will mirror the task component organisation,
+> so each task ID maps to a real folder you can hand to an AI agent."
 
 ---
 
