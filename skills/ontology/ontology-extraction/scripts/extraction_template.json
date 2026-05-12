@@ -1,0 +1,48 @@
+{
+  "ontology_version": "1.0",
+  "chunk_id": "chunk_REPLACE_ME",
+  "entities": [
+    {
+      "id": "chunk_REPLACE_ME_ent_001",
+      "canonical_name": "",
+      "type": "Person",
+      "aliases": [],
+      "description": "",
+      "attributes": {},
+      "salience": 0.5,
+      "mentions": []
+    }
+  ],
+  "relations": [
+    {
+      "id": "chunk_REPLACE_ME_rel_001",
+      "subject": "chunk_REPLACE_ME_ent_001",
+      "predicate": "knows",
+      "object": "chunk_REPLACE_ME_ent_002",
+      "context": "",
+      "attributes": {},
+      "confidence": 0.9
+    }
+  ],
+  "events": [
+    {
+      "id": "chunk_REPLACE_ME_evt_001",
+      "name": "",
+      "description": "",
+      "date": null,
+      "participants": [],
+      "location": null,
+      "consequences": [],
+      "context": ""
+    }
+  ],
+  "themes": [
+    {
+      "id": "chunk_REPLACE_ME_thm_001",
+      "name": "",
+      "description": "",
+      "related_entities": [],
+      "related_events": []
+    }
+  ]
+}
