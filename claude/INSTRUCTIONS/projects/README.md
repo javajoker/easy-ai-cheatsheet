@@ -39,4 +39,3 @@ When a project is archived or sunsetted:
 - Move its memory entries to `status: superseded` (see `memory-ontology`).
 - The instructions stay in place as historical reference; do not delete unless
   the entire project is gone from disk.
-

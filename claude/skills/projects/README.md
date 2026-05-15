@@ -3,7 +3,8 @@
 This directory holds **project-specific skills** — skills that only apply when
 the user is working inside one specific project (or family of projects). They
 are kept here, separate from the portable skill categories (`dev-go/`,
-`design/`, `ideas/`, etc.), so that the portable surface stays clean.
+`dev-node/`, `dev-python/`, `dev-java/`, `design/`, `ideas/`, etc.), so that
+the portable surface stays clean.
 
 ## Layout
 
@@ -69,4 +70,3 @@ Do *not* create one when:
   enough.
 - The "specifics" are really just a handful of style preferences — capture
   those in `INSTRUCTIONS/projects/<slug>/conventions.md` instead.
-

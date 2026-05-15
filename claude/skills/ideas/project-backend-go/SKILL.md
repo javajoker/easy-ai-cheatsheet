@@ -607,6 +607,14 @@ func (c *sendgridClient) Send(ctx context.Context, p SendPayload) error {
 - Test coverage ≥ 80% for service layer, ≥ 60% overall
 - `make ci` runs everything
 
+### Code quality reference
+Apply the `dev-go/*` skill pack as the canonical style and quality reference
+during generation. The most directly relevant skills:
+- `go-style-core`, `go-naming`, `go-packages`, `go-declarations` — foundational style
+- `go-error-handling`, `go-control-flow`, `go-defensive`, `go-context`, `go-concurrency`, `go-interfaces`, `go-generics`, `go-data-structures`, `go-functions`, `go-functional-options`
+- `go-testing`, `go-logging`, `go-performance`, `go-documentation`, `go-linting`
+- `go-code-review` (for the final review pass)
+
 ### Makefile targets
 ```makefile
 .PHONY: dev test lint migrate seed build docker

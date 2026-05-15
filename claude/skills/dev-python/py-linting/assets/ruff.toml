@@ -1,0 +1,56 @@
+# Canonical Ruff configuration for new Python projects.
+# Drop into the repo root as ruff.toml, OR move the contents under
+# [tool.ruff] / [tool.ruff.lint] in pyproject.toml.
+
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = [".venv", "venv", "build", "dist", "__pycache__"]
+
+[lint]
+# Curated rule set: strict, but practical for everyday work.
+select = [
+    "E", "W",        # pycodestyle
+    "F",             # pyflakes
+    "I",             # isort
+    "B",             # flake8-bugbear (mutable defaults, etc.)
+    "C4",            # flake8-comprehensions
+    "UP",            # pyupgrade
+    "N",             # pep8-naming
+    "S",             # flake8-bandit (security)
+    "SIM",           # flake8-simplify
+    "RUF",           # ruff-specific
+    "ASYNC",         # flake8-async
+    "TID",           # flake8-tidy-imports
+    "ARG",           # flake8-unused-arguments
+    "PTH",           # use pathlib over os.path
+    "PIE",           # misc anti-patterns
+    "TRY",           # try/except hygiene
+]
+
+ignore = [
+    "E501",          # line length — handled by the formatter
+    "TRY003",        # long exception messages — sometimes useful
+    "S101",          # assert — allowed in tests via per-file-ignores below
+]
+
+[lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106", "ARG001", "ARG002"]
+"**/conftest.py" = ["S101"]
+"__init__.py" = ["F401", "F403"]                # re-exports
+
+[lint.flake8-tidy-imports]
+ban-relative-imports = "parents"                # disallow ../.. style imports
+
+[lint.pydocstyle]
+convention = "google"
+
+[lint.isort]
+known-first-party = ["myapp"]
+combine-as-imports = true
+
+[format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+line-ending = "lf"

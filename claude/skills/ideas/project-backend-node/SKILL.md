@@ -422,6 +422,14 @@ Common integrations:
 - Vitest — `pnpm test` passes (unit + integration)
 - Test coverage ≥ 80% for service layer, ≥ 60% overall
 
+### Code quality reference
+Apply the `dev-node/*` skill pack as the canonical style and quality reference
+during generation. The most directly relevant skills:
+- `node-style-core`, `node-naming`, `node-types` — foundational style and type discipline
+- `node-modules`, `node-async`, `node-error-handling`, `node-control-flow`, `node-functions`, `node-data-structures`, `node-classes`, `node-streams`
+- `node-testing`, `node-logging`, `node-config`, `node-http`, `node-security`, `node-performance`
+- `node-documentation`, `node-linting`, `node-code-review` (for the final review pass)
+
 ### .env.example (full)
 ```
 NODE_ENV=development

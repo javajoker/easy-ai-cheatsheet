@@ -342,7 +342,7 @@ support, not against it.
 | `cognitive-alignment` | shipped | Lock down load-bearing terms before changing them. |
 | `project-knowledge-base` | shipped | Update the conceptual model. |
 | `memory-ontology` | shipped | Record the architectural decision. |
-| Language-specific dev skills (`dev-go/*` etc.) | shipped | Per-language quality guidance during the refactor. |
+| Language-specific dev skills (`dev-go/*`, `dev-node/*`, `dev-python/*`, `dev-java/*`) | shipped | Per-language quality guidance during the refactor. |
 | `compact-ritual` | shipped | Available if the refactor session runs long. |
 
 ---
@@ -377,7 +377,7 @@ been onboarded.
 |---|---|---|
 | `skill-orchestrator` | shipped | Picks the chain; for most day-to-day work, single-skill workflows skip it. |
 | `cognitive-alignment` | shipped | Always running in the background. |
-| Language-specific dev skills | shipped | E.g. for Go: `go-style-core`, `go-naming`, `go-testing`, `go-error-handling`. |
+| Language-specific dev skills | shipped | E.g. for Go: `go-style-core`, `go-naming`, `go-testing`, `go-error-handling`. Node.js: `node-*`. Python: `py-*`. Java: `java-*`. |
 | `doc-markdown-standards` | shipped | If the project uses Obsidian-style docs and you're updating them. |
 | `memory-ontology` | shipped | If any decision worth remembering surfaces. |
 
@@ -409,15 +409,17 @@ been onboarded.
 
 | Skill | Status | Role |
 |---|---|---|
-| `go-code-review` (or language equivalent) | shipped for Go | Language-specific review checks. |
+| `go-code-review` / `node-code-review` / `py-code-review` / `java-code-review` (or language equivalent) | shipped for Go, Node.js, Python, Java | Language-specific review checks. |
 | `cognitive-alignment` | shipped | If review surfaces ambiguous terms with the author. |
 | Project knowledge base | data, not skill | Entities referenced by the changed code. |
 
-The framework currently ships `go-code-review` for Go projects.
-**Other-language equivalents are not yet skill-packaged** — for
-TypeScript / Python / Rust reviews, fall back to running the project's
-own lint/test commands and using `cognitive-alignment` + general
-principles from `INSTRUCTIONS/`.
+The framework currently ships `go-code-review` for Go projects,
+`node-code-review` for Node.js / TypeScript projects, `py-code-review`
+for Python projects, and `java-code-review` for Java projects.
+**Other-language equivalents are not yet skill-packaged** — for Rust /
+Ruby / Kotlin reviews, fall back to running the project's own lint/test
+commands and using `cognitive-alignment` + general principles from
+`INSTRUCTIONS/`.
 
 ---
 
@@ -641,6 +643,27 @@ The previous `go-stardust-rtl` was moved out of this group into
 `skills/projects/stardust-rtl/` because it is project-specific rather than
 generic Go guidance.
 
+### `dev-node/` — Node.js / TypeScript quality skills
+
+20 portable skills covering style, naming, types, modules, async,
+error-handling, control-flow, functions, data-structures, classes, streams,
+testing, logging, config, HTTP, security, performance, documentation,
+linting, and code-review. All shipped (✓).
+
+### `dev-python/` — Python quality skills
+
+20 portable skills covering style, naming, typing, modules, async,
+error-handling, control-flow, functions, data-structures, classes,
+iterators/generators, testing, logging, config, HTTP, security,
+performance, documentation, linting, and code-review. All shipped (✓).
+
+### `dev-java/` — Java quality skills
+
+20 portable skills covering style, naming, packages, types, generics,
+concurrency, error-handling, control-flow, methods/lambdas,
+data-structures, classes, testing, logging, config, HTTP, security,
+performance, documentation, linting, and code-review. All shipped (✓).
+
 ### `projects/` — project-specific skills
 
 | Skill | Status |
@@ -668,14 +691,15 @@ Add additional entries here when a project earns one (see
 
 | Need | Status | Workaround |
 |---|---|---|
-| Language-specific review skills beyond Go (`ts-code-review`, `py-code-review`, etc.) | ✗ | Use general principles + project lint/test commands. |
-| Per-language skill suites beyond Go (`dev-python/*`, `dev-ts/*`, etc.) | ✗ | Use universal `INSTRUCTIONS/standards/code-standards.md` plus project-specific conventions. |
+| Language-specific review skills beyond Go, Node, Python, and Java (`rust-code-review`, `kotlin-code-review`, etc.) | ✗ | Use general principles + project lint/test commands. |
+| Per-language skill suites beyond Go, Node, Python, and Java (`dev-rust/*`, `dev-kotlin/*`, etc.) | ✗ | Use universal `INSTRUCTIONS/standards/code-standards.md` plus project-specific conventions. |
 | Security-review skill (cross-language) | ✗ | Use `INSTRUCTIONS/development-principles.md` defensive sections plus project's security guidelines. |
 | API-contract diff skill | ✗ | Manual diff review against OpenAPI / proto files. |
 
 These gaps are candidates for future skills. When you write one, follow the
-shape of `skills/dev-go/go-code-review/` as the template and update the
-relevant scenarios above.
+shape of `skills/dev-go/go-code-review/`, `skills/dev-node/node-code-review/`,
+`skills/dev-python/py-code-review/`, or `skills/dev-java/java-code-review/`
+as the template and update the relevant scenarios above.
 
 ---
 

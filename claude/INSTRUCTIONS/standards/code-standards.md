@@ -1,9 +1,10 @@
 # Code Standards
 
 > Language-agnostic code principles. Per-language detail lives in the
-> `skills/dev-<language>/` family of skills (`skills/dev-go/*` covers the
-> Go-specific rules); the project's `projects/<name>/` directory can extend
-> these for a project's particular conventions.
+> `skills/dev-<language>/` family of skills (`skills/dev-go/*`,
+> `skills/dev-node/*`, `skills/dev-python/*`, and `skills/dev-java/*` cover
+> the respective language-specific rules); the project's `projects/<name>/`
+> directory can extend these for a project's particular conventions.
 
 ## Universal principles
 
@@ -92,11 +93,15 @@ These apply regardless of language.
 | Language | Skills to consult |
 |---|---|
 | Go | `skills/dev-go/*` — 20 skills covering style, naming, errors, concurrency, generics, testing, etc. |
+| Node.js / TypeScript | `skills/dev-node/*` — 20 skills covering style, types, async, errors, modules, HTTP, security, testing, etc. |
+| Python | `skills/dev-python/*` — 20 skills covering style, typing, async, errors, modules, HTTP, security, testing, etc. |
+| Java | `skills/dev-java/*` — 20 skills covering style, types, concurrency, errors, packages, HTTP, security, testing, etc. |
 | Other | Project-specific. Reference the project's `projects/<name>/code-standards.md` if present. |
 
 When a project introduces a new language not yet covered, add the per-language
-skill set (see `skills/dev-go/` as the template) before substantial work in
-that language. Style consistency depends on having something to consult.
+skill set (see `skills/dev-go/`, `skills/dev-node/`, `skills/dev-python/`, or
+`skills/dev-java/` as templates) before substantial work in that language.
+Style consistency depends on having something to consult.
 
 ## Verification
 

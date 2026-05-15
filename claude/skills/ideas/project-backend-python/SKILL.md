@@ -598,6 +598,14 @@ def send_email(to: str, template: str, data: dict):
 - `pytest --cov=app` ≥ 80% service layer, ≥ 60% overall
 - `pre-commit` hooks enforce all of the above on commit
 
+### Code quality reference
+Apply the `dev-python/*` skill pack as the canonical style and quality
+reference during generation. The most directly relevant skills:
+- `py-style-core`, `py-naming`, `py-typing`, `py-modules` — foundational style and type discipline
+- `py-async`, `py-error-handling`, `py-control-flow`, `py-functions`, `py-data-structures`, `py-classes`, `py-iterators-generators`
+- `py-testing`, `py-logging`, `py-config`, `py-http`, `py-security`, `py-performance`
+- `py-documentation`, `py-linting`, `py-code-review` (for the final review pass)
+
 ### pyproject.toml (poetry example)
 ```toml
 [tool.poetry]

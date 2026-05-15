@@ -54,6 +54,9 @@ claude/
     │   ├── project-knowledge-base/ # conceptual knowledge graph of a project
     │   └── create-project-instruction/  # focused producer for INSTRUCTIONS/projects/<slug>/
     ├── dev-go/                     # 20 Go style and quality skills (portable)
+    ├── dev-node/                   # 20 Node.js / TypeScript skills (portable)
+    ├── dev-python/                 # 20 Python style and quality skills (portable)
+    ├── dev-java/                   # 20 Java style and quality skills (portable)
     ├── dev-tools/                  # ccc (semantic search), doc-markdown-standards, omc-reference
     ├── design/                     # ui-ux-pro-max
     ├── knowledge-graph/            # book / long-text → ontology pipeline (6 skills)
@@ -67,11 +70,14 @@ claude/
 | `share/` | 8 |
 | `ideas/` | 11 |
 | `dev-go/` | 20 |
+| `dev-node/` | 20 |
+| `dev-python/` | 20 |
+| `dev-java/` | 20 |
 | `dev-tools/` | 3 |
 | `design/` | 1 |
 | `knowledge-graph/` | 6 |
 | `projects/` | 1 |
-| **Total** | **50** |
+| **Total** | **110** |
 
 Plus 13 portable instruction files under `INSTRUCTIONS/` and 2 templates.
 The top-level `REQUIREMENTS-AUDIT.md` records the verified completion of
@@ -146,5 +152,6 @@ full audit summary. Key changes:
 ## License and authorship
 
 See individual skill SKILL.md files for license metadata where applicable.
-The `dev-go/*` skills derive from public Go style guides; their attributions
-are in their own frontmatter.
+The `dev-go/*`, `dev-node/*`, `dev-python/*`, and `dev-java/*` skills derive
+from public language style guides; per-skill attributions are in their own
+frontmatter.
