@@ -1,12 +1,15 @@
-# ai-claude — Claude Code skills + instructions framework
+# ai-claude — Claude Code skills + instructions + agents framework
 
 A portable, project-agnostic framework for using Claude Code consistently across
-many projects. It combines two layers:
+many projects. It combines three layers:
 
 - **`INSTRUCTIONS/`** — universal engineering principles and conventions
   always loaded by Claude.
 - **`skills/`** — task-specific capabilities loaded on demand by Claude when
   their triggers fire.
+- **`agents/`** — named roles that bundle a workflow, a set of skills, and a
+  deliverable contract for a specific job (lifecycle, architecture upgrade,
+  scenario strategy, devops, enterprise knowledge base).
 
 The framework is **English-first** so the model can maintain it uniformly.
 Project output (code, docs, user-facing copy, conversational restate phrases)
@@ -29,6 +32,14 @@ claude/
 │   ├── workflows/                  # git, task management
 │   ├── templates/                  # per-project template files
 │   └── projects/                   # filled instances for specific projects
+├── agents/                         # named roles that compose skills + workflow
+│   ├── README.md                   # what agents are; how they relate to skills
+│   ├── CHECKLIST.md                # build status of all agents + dependent skills
+│   ├── lifecycle-pilot/            # prototype → prod → go-to-market
+│   ├── architecture-shepherd/      # architecture upgrade support
+│   ├── scenario-strategist/        # scenario analysis + workflow + group formation
+│   ├── devops-engineer/            # CI/CD, IaC, observability, runbooks, secrets
+│   └── knowledge-curator/          # enterprise knowledge base upgrade
 └── skills/
     ├── share/                      # cross-cutting meta-skills
     │   ├── skill-orchestrator/     # picks and chains skills for multi-step tasks
@@ -60,6 +71,11 @@ claude/
     ├── dev-tools/                  # ccc (semantic search), doc-markdown-standards, omc-reference
     ├── design/                     # ui-ux-pro-max
     ├── knowledge-graph/            # book / long-text → ontology pipeline (6 skills)
+    ├── gtm/                        # go-to-market skills (lifecycle-pilot — 6 stubs)
+    ├── architecture/               # architecture upgrade skills (architecture-shepherd — 5 stubs)
+    ├── scenario/                   # scenario / workflow / group formation skills (scenario-strategist — 4 stubs)
+    ├── devops/                     # devops skills (devops-engineer — 7 stubs)
+    ├── enterprise-kb/              # enterprise KB skills (knowledge-curator — 5 stubs)
     └── projects/                   # project-specific skills (e.g. stardust-rtl)
 ```
 
@@ -76,8 +92,17 @@ claude/
 | `dev-tools/` | 3 |
 | `design/` | 1 |
 | `knowledge-graph/` | 6 |
+| `gtm/` | 6 |
+| `architecture/` | 5 |
+| `scenario/` | 4 |
+| `devops/` | 7 |
+| `enterprise-kb/` | 5 |
 | `projects/` | 1 |
-| **Total** | **110** |
+| **Total** | **137** (all shipped) |
+
+| Agents | Count |
+|---|---|
+| `agents/` (scaffold) | 5 |
 
 Plus 13 portable instruction files under `INSTRUCTIONS/` and 2 templates.
 The top-level `REQUIREMENTS-AUDIT.md` records the verified completion of
@@ -100,6 +125,9 @@ the framework-consolidation request that produced this revision.
 - **First time using this?** See [HOWTO.md](HOWTO.md).
 - **Want a step-by-step playbook for a common situation?** See
   [SCENARIOS.md](SCENARIOS.md).
+- **Which agents own which jobs?** See [agents/README.md](agents/README.md).
+- **Current build status of agents + new skills?** See
+  [agents/CHECKLIST.md](agents/CHECKLIST.md).
 - **Onboarding an existing project?** Run the `project-onboarding` skill.
 - **Starting a new project from an idea?** Run the `project-prototype`
   skill — it kicks off the eight-skill linear chain.

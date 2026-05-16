@@ -1,0 +1,148 @@
+# Prometheus AlertManager baseline rules.
+# Save as: observability/alert-rules.yaml
+# Customise thresholds per service.
+
+groups:
+  - name: service-health
+    interval: 30s
+    rules:
+
+      # ── Service down ───────────────────────────────────────
+      - alert: ServiceDown
+        expr: up{job="<service>"} == 0
+        for: 2m
+        labels:
+          severity: SEV1
+          team: <team>
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          runbook_url: "<runbook-url>"
+          dashboard_url: "<dashboard-url>"
+
+      # ── Error rate spike ───────────────────────────────────
+      - alert: ErrorRateHigh
+        expr: |
+          (
+            sum(rate(http_requests_total{job="<service>",status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{job="<service>"}[5m]))
+          ) > 0.02
+        for: 5m
+        labels:
+          severity: SEV1
+          team: <team>
+        annotations:
+          summary: "Error rate >2% for {{ $labels.job }} sustained 5m"
+          runbook_url: "<runbook-url>"
+          dashboard_url: "<dashboard-url>"
+
+      # ── Latency regression ─────────────────────────────────
+      - alert: LatencyP95High
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(http_request_duration_seconds_bucket{job="<service>"}[10m])) by (le)
+          ) > <threshold-seconds>
+        for: 10m
+        labels:
+          severity: SEV2
+          team: <team>
+        annotations:
+          summary: "p95 latency above threshold for {{ $labels.job }}"
+          runbook_url: "<runbook-url>"
+          dashboard_url: "<dashboard-url>"
+
+  # ── SLO burn-rate alerts (multi-window-multi-burn-rate) ────
+  - name: slo-burn-rate
+    interval: 30s
+    rules:
+
+      # Fast burn — page immediately
+      - alert: SLOFastBurn
+        expr: |
+          (
+            slo_error_budget_burn_rate{slo="<slo-name>",window="5m"} > 14.4
+          )
+          and
+          (
+            slo_error_budget_burn_rate{slo="<slo-name>",window="1h"} > 14.4
+          )
+        for: 2m
+        labels:
+          severity: SEV1
+          team: <team>
+        annotations:
+          summary: "SLO fast burn: error budget exhausted in 5m at current rate"
+          runbook_url: "<runbook-url>"
+
+      # Slow burn — notify
+      - alert: SLOSlowBurn
+        expr: |
+          (
+            slo_error_budget_burn_rate{slo="<slo-name>",window="30m"} > 6
+          )
+          and
+          (
+            slo_error_budget_burn_rate{slo="<slo-name>",window="6h"} > 6
+          )
+        for: 15m
+        labels:
+          severity: SEV2
+          team: <team>
+        annotations:
+          summary: "SLO slow burn: sustained degradation"
+          runbook_url: "<runbook-url>"
+
+  # ── Resource saturation ────────────────────────────────────
+  - name: resource-saturation
+    interval: 30s
+    rules:
+
+      - alert: CPUSaturation
+        expr: |
+          avg(rate(container_cpu_usage_seconds_total{job="<service>"}[5m])) > 0.8
+        for: 30m
+        labels:
+          severity: SEV2
+          team: <team>
+        annotations:
+          summary: "CPU >80% for {{ $labels.job }} sustained 30m"
+
+      - alert: MemorySaturation
+        expr: |
+          (container_memory_working_set_bytes{job="<service>"} /
+           container_spec_memory_limit_bytes{job="<service>"}) > 0.9
+        for: 15m
+        labels:
+          severity: SEV2
+          team: <team>
+        annotations:
+          summary: "Memory >90% of limit for {{ $labels.job }}"
+
+  # ── Dependency health ──────────────────────────────────────
+  - name: dependencies
+    interval: 30s
+    rules:
+
+      - alert: DownstreamDegraded
+        expr: |
+          (
+            sum(rate(downstream_calls_total{job="<service>",status="error"}[10m]))
+            /
+            sum(rate(downstream_calls_total{job="<service>"}[10m]))
+          ) > 0.01
+        for: 10m
+        labels:
+          severity: SEV2
+          team: <team>
+        annotations:
+          summary: "Downstream error rate >1% from {{ $labels.job }}"
+
+# Notes:
+# - Replace <service>, <team>, <runbook-url>, <dashboard-url>,
+#   <threshold-seconds>, <slo-name> per service.
+# - SEV1 alerts page; SEV2 alerts notify channel.
+# - Every alert MUST have a runbook URL — alerts without runbooks
+#   are alert-fatigue waiting to happen.
+# - Tune `for:` durations per service traffic patterns. Low-traffic
+#   services need longer windows to reduce noise.

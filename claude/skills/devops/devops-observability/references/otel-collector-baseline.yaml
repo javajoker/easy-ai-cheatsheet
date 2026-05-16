@@ -1,0 +1,134 @@
+# OpenTelemetry Collector baseline configuration.
+# Save as: observability/otel-collector-config.yaml
+# Replace <backend-endpoint> + auth per chosen backend.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Prometheus scrape (for non-OTel emitters)
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: 'self'
+          scrape_interval: 30s
+          static_configs:
+            - targets: ['localhost:8888']
+
+processors:
+  # Batching reduces export overhead
+  batch:
+    timeout: 5s
+    send_batch_size: 1000
+
+  # Memory limiter prevents OOM in spikes
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
+
+  # Attribute redaction — strip PII per project policy
+  attributes/redact:
+    actions:
+      - key: user.email
+        action: delete
+      - key: user.phone
+        action: delete
+      - key: auth.token
+        action: delete
+      - key: payment.card_number
+        action: delete
+
+  # Resource detection — add k8s/host metadata
+  resourcedetection:
+    detectors: [env, system, gcp, ec2]
+    timeout: 2s
+
+  # Tail-based sampling — keep errors + slow traces always
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 100000
+    policies:
+      - name: errors-policy
+        type: status_code
+        status_code: { status_codes: [ERROR] }
+      - name: slow-traces-policy
+        type: latency
+        latency: { threshold_ms: 1000 }
+      - name: probabilistic-policy
+        type: probabilistic
+        probabilistic: { sampling_percentage: 10 }
+
+exporters:
+  # Replace per backend choice:
+
+  # Self-hosted: emit to Loki + Prometheus + Tempo
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+  prometheusremotewrite:
+    endpoint: http://prometheus:9090/api/v1/write
+
+  loki:
+    endpoint: http://loki:3100/loki/api/v1/push
+
+  # SaaS examples (uncomment one):
+  # otlp/datadog:
+  #   endpoint: ${DATADOG_OTLP_ENDPOINT}
+  #   headers:
+  #     dd-api-key: ${DATADOG_API_KEY}
+  # otlp/honeycomb:
+  #   endpoint: api.honeycomb.io:443
+  #   headers:
+  #     x-honeycomb-team: ${HONEYCOMB_API_KEY}
+  # otlp/grafana-cloud:
+  #   endpoint: ${GRAFANA_CLOUD_OTLP_ENDPOINT}
+  #   auth:
+  #     authenticator: basicauth/grafana-cloud
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  pprof:
+    endpoint: 0.0.0.0:1777
+
+service:
+  extensions: [health_check, pprof]
+
+  telemetry:
+    logs:
+      level: info
+    metrics:
+      level: detailed
+      address: 0.0.0.0:8888
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, attributes/redact, tail_sampling, batch]
+      exporters: [otlp/tempo]
+
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [memory_limiter, resourcedetection, batch]
+      exporters: [prometheusremotewrite]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, attributes/redact, batch]
+      exporters: [loki]
+
+# Notes:
+# - Backends are pluggable. Switch by uncommenting the relevant
+#   exporter and updating the pipeline `exporters:` field.
+# - Tail-based sampling keeps all errors + slow traces + 10% baseline.
+#   Adjust sampling_percentage for traffic volume.
+# - Attribute redaction is the load-bearing privacy step. Add
+#   project-specific PII fields here.
+# - Memory limiter must be the FIRST processor; spike protection.

@@ -1,0 +1,94 @@
+# Baseline CI/CD for a typical project on GitHub Actions.
+# Customise per language: replace install / lint / test / build commands.
+# Save as: .github/workflows/ci.yml
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up <language>
+        uses: <actions/setup-node@v4 | actions/setup-go@v5 | actions/setup-python@v5 | actions/setup-java@v4>
+        with:
+          # version pulled from project-context.md
+          <version-key>: <version>
+      - name: Restore deps cache
+        uses: actions/cache@v4
+        with:
+          path: <lang-specific path>
+          key: ${{ runner.os }}-deps-${{ hashFiles('<lockfile>') }}
+      - name: Install deps
+        run: <install command>
+      - name: Lint
+        run: <lint command>   # from <lang>-linting skill
+
+  type-check:
+    name: Type check
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      # ... setup + cache (same as lint) ...
+      - name: Type check
+        run: <type-check command>   # from <lang>-types / <lang>-typing skill
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      # ... setup + cache ...
+      - name: Unit tests
+        run: <unit test command>     # from <lang>-testing skill
+      - name: Integration tests
+        run: <integration test command>
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [type-check, test]
+    steps:
+      - uses: actions/checkout@v4
+      # ... setup + cache ...
+      - name: Build
+        run: <build command>
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: <artifact path>
+          retention-days: 7
+
+  security:
+    name: Security scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependency scan
+        run: <dep scan command — e.g. pnpm audit / pip-audit / govulncheck>
+      - name: Secrets scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

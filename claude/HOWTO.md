@@ -15,6 +15,7 @@ Symlink or copy the directories into `~/.claude/`:
 # From the repo root:
 ln -s "$(pwd)/claude/INSTRUCTIONS" ~/.claude/INSTRUCTIONS
 ln -s "$(pwd)/claude/skills"       ~/.claude/skills
+ln -s "$(pwd)/claude/agents"       ~/.claude/agents
 ```
 
 This makes the entire framework available in every Claude Code session,
@@ -28,6 +29,7 @@ Symlink or copy under the project's `.claude/`:
 # From inside a project repository:
 ln -s /path/to/ai-claude/claude/INSTRUCTIONS .claude/INSTRUCTIONS
 ln -s /path/to/ai-claude/claude/skills       .claude/skills
+ln -s /path/to/ai-claude/claude/agents       .claude/agents
 ```
 
 This scopes the framework to one project. Useful when different projects
@@ -60,7 +62,9 @@ description. For example, saying *"build me a habit-tracking app"* triggers
 `project-prototype` even though the skill isn't named.
 
 The `skill-orchestrator` is the meta-skill that fires first for any
-multi-step request and picks the right chain.
+multi-step request and picks the right chain — including preferring a
+**named agent** over an ad-hoc skill chain when one matches (see
+[Agents — the role layer](#agents--the-role-layer) below).
 
 ### Explicit triggering
 
@@ -83,9 +87,76 @@ Even though they live in `skills/share/`, these four should be thought of as
 2. **`memory-ontology`** — manages `MEMORY.md` and the per-memory files
    as an ontology graph.
 3. **`compact-ritual`** — protects session state through `/compact`.
-4. **`skill-orchestrator`** — picks and chains other skills.
+4. **`skill-orchestrator`** — picks and chains other skills (and picks
+   named **agents** when one fits the request).
 
 If you go an entire session without any of these firing, something is wrong.
+
+## Agents — the role layer
+
+Agents sit on top of skills. They are named roles that bundle a
+workflow + skills + deliverables for a specific job. The framework
+ships five:
+
+| Agent | Job |
+|---|---|
+| [`lifecycle-pilot`](agents/lifecycle-pilot/AGENT.md) | Prototype → production code → go-to-market launch |
+| [`scenario-strategist`](agents/scenario-strategist/AGENT.md) | Scenario analysis, workflow design, agent-group formation |
+| [`devops-engineer`](agents/devops-engineer/AGENT.md) | CI/CD, IaC, observability, runbooks, releases, security, secrets |
+| [`architecture-shepherd`](agents/architecture-shepherd/AGENT.md) | Architecture upgrade end-to-end (assess → migrate → roll out → communicate) |
+| [`knowledge-curator`](agents/knowledge-curator/AGENT.md) | Enterprise knowledge base (architecture → merge → refresh → search → ACL) |
+
+### When the orchestrator picks an agent vs a skill chain
+
+The orchestrator's Phase 1 now reads both the skill catalog **and**
+`agents/CHECKLIST.md`. Decision flow:
+
+| Match | Routing |
+|---|---|
+| Request matches one agent's `fires_on` triggers | Invoke that agent — its AGENT.md is the workflow |
+| Request matches multiple agents | Engage `scenario-strategist` — it forms a group via `agent-group-formation` |
+| No agent matches | Fall back to skill-level chain planning |
+
+This means most multi-step requests are routed through agents now,
+not raw skill chains.
+
+### Invoking an agent
+
+Three ways an agent fires:
+
+- **Implicit (via orchestrator).** A request matching the agent's
+  `fires_on` triggers routes there automatically. Saying *"take this
+  idea all the way to launch"* fires `lifecycle-pilot` without
+  naming it.
+- **By name.** *"Use the architecture-shepherd agent to plan the
+  Postgres major upgrade."*
+- **By scenario.** Following a scenario from
+  [SCENARIOS.md](SCENARIOS.md) M–S puts you in the right agent's
+  workflow.
+
+### What you should expect from an agent
+
+Each agent's AGENT.md declares a **deliverable contract** — the
+artifacts that prove the job is done. When the agent declares
+done, every contract item exists and has been audited via
+`requirement-audit`. If a contract item is missing, the agent
+hasn't actually shipped.
+
+### Agents vs skills — when to write one or the other
+
+| If the work is… | Ship a… |
+|---|---|
+| One task, one job, one handoff | **Skill** |
+| A coherent multi-phase *job* with deliverable contract | **Agent** |
+| A recurring chain you find yourself orchestrating manually | **Agent** (promote the pattern) |
+| A short ad-hoc chain | Use `skill-orchestrator` directly |
+
+If the agent's whole workflow is *"call skill X"*, it's a skill —
+not an agent. Don't add a wrapper layer.
+
+See [agents/README.md](agents/README.md) for the agents-layer
+rationale and [agents/CHECKLIST.md](agents/CHECKLIST.md) for build
+status of all agents and their dependent skills.
 
 ## Working with the MEMORY ontology
 
@@ -332,8 +403,14 @@ collision.
 
 ## See also
 
-- [SCENARIOS.md](SCENARIOS.md) — step-by-step playbooks for common workflows.
+- [SCENARIOS.md](SCENARIOS.md) — step-by-step playbooks. Scenarios A–L
+  are skill-level; **M–S are agent-level** (one per agent + two
+  multi-agent compositions).
+- [agents/README.md](agents/README.md) — the role layer.
+- [agents/CHECKLIST.md](agents/CHECKLIST.md) — agent + new-skill build
+  status.
 - `INSTRUCTIONS/README.md` — universal-instructions overview.
 - `skills/ideas/README.md` and `skills/ideas/WORKFLOW.md` — project
-  lifecycle skills.
-- `skills/share/skill-orchestrator/SKILL.md` — meta-orchestration logic.
+  lifecycle skills (consumed by `lifecycle-pilot` agent).
+- `skills/share/skill-orchestrator/SKILL.md` — meta-orchestration logic
+  with agent-preference rules.

@@ -162,9 +162,105 @@ This is usually a single-skill task — `skill-creator` is the entire workflow. 
 
 ---
 
+## Shape 5 — Agent group
+
+When the request matches a named **agent**'s `fires_on` triggers, the agent's own workflow *is* the chain — don't re-plan it at the skill level. When the request matches *multiple* agents, engage `scenario-strategist` to form the group.
+
+These patterns assume the agents from `agents/CHECKLIST.md`. Read it fresh; the catalog evolves.
+
+### Single-agent — lifecycle-pilot
+
+**User signal:** "Take this idea all the way to launch", "I want to build X and launch it", "we need GTM for the MVP"
+**Routing:** `lifecycle-pilot` agent (single match)
+**Chain:** the agent's 7-phase arc (prototype → docs → task-breakdown → frontend+backend → launch-readiness → GTM → public launch)
+**Inputs needed upfront (cap at 3 across the whole arc):**
+- Backend language (Node / Go / Python)
+- Launch posture (closed beta / open beta / public)
+- Compliance regime (none / GDPR / HIPAA / SOC2)
+
+See [Scenario M](../../../../SCENARIOS.md#scenario-m--taking-an-idea-all-the-way-to-launch-lifecycle-pilot) for the playbook.
+
+### Single-agent — architecture-shepherd
+
+**User signal:** "Plan our re-architecture", "should we split the monolith", "upgrade Postgres major", "deprecate v1 of the API"
+**Routing:** `architecture-shepherd` agent
+**Chain:** assessment → decision → migration plan (or dependency-upgrade variant) → rollout strategy → breaking-change comms
+**Inputs needed upfront:**
+- Triggering concern (perf / cost / team / compliance / roadmap)
+- Decision authority
+- Time available for assessment
+
+See [Scenario P](../../../../SCENARIOS.md#scenario-p--architecture-upgrade-architecture-shepherd).
+
+### Single-agent — devops-engineer
+
+**User signal:** "Set up CI/CD", "add observability", "write runbooks", "harden for prod", "rotate secrets"
+**Routing:** `devops-engineer` agent (engaged workstreams only — not all 7 at once)
+**Chain:** the requested workstream(s) from {ci-cd / iac / observability / incident-runbook / release-management / security-hardening / secrets}
+**Inputs needed upfront:**
+- Which workstream(s)
+- Platform / cloud / vault choices
+- Approval chain for prod
+
+See [Scenario O](../../../../SCENARIOS.md#scenario-o--operational-baseline--ongoing-ops-devops-engineer).
+
+### Single-agent — knowledge-curator
+
+**User signal:** "Build the enterprise KB", "merge the project KBs", "set up RAG over our docs", "set up access control on the KB"
+**Routing:** `knowledge-curator` agent
+**Chain:** architecture → merge → refresh-policy → search-index → access-control
+**Inputs needed upfront:**
+- Compliance regime (drives `regulated` classification rules)
+- Vector DB + embedding model preferences
+- Source inventory (which project KBs / books / memory)
+
+See [Scenario Q](../../../../SCENARIOS.md#scenario-q--enterprise-knowledge-base-knowledge-curator).
+
+### Multi-agent — re-architecture + relaunch
+
+**User signal:** "Re-architect and relaunch as v2", "migrate to k8s during the v2 launch window"
+**Routing:** **multiple agents match → engage `scenario-strategist`** (do NOT route to one of the candidate agents alone)
+**Chain:**
+1. `scenario-strategist`'s four-phase arc (analysis → workflow → group → handoffs) forms the group.
+2. Group typically: `architecture-shepherd` (lead, architecture phases) → `lifecycle-pilot` (lead, relaunch phases) → `devops-engineer` (supports both throughout).
+3. Strategist remains conductor across phase boundaries.
+
+**Inputs needed upfront (cap at 3, gathered by strategist's Phase 1):**
+- Time horizon for the combined work
+- Reversibility tolerance
+- Customer impact tolerance during the transition
+
+See [Scenario R](../../../../SCENARIOS.md#scenario-r--re-architecture--relaunch-multi-agent).
+
+### Multi-agent — enterprise KB + AI feature launch
+
+**User signal:** "Build the enterprise KB and ship the AI features that depend on it", "we need RAG for the new feature, but also the KB underneath doesn't exist yet"
+**Routing:** **multiple agents match → engage `scenario-strategist`**
+**Chain:**
+1. `scenario-strategist` forms the group.
+2. Group: `knowledge-curator` (KB lead) + `lifecycle-pilot` (AI feature lead) + `devops-engineer` (vector DB hosting + AI feature CI/CD).
+3. The KB ↔ AI feature handoff is a contracted artifact (retrieval client API) under `agent-handoff-protocol`.
+
+See [Scenario S](../../../../SCENARIOS.md#scenario-s--enterprise-kb--ai-feature-launch-multi-agent).
+
+### Agent routing — decision rules summary
+
+| Match | Routing |
+|---|---|
+| 0 agents | Fall back to Shapes 1–4 (skill-level chains) |
+| 1 agent | Invoke that agent by name; its AGENT.md is the workflow |
+| ≥2 agents | Engage `scenario-strategist`; it forms the group |
+| Ambiguous | Read the candidate agents' `fires_on` triggers; pick the one whose triggers most specifically match; if tied, engage strategist |
+
+**Hardcoding is forbidden.** Always read `agents/CHECKLIST.md` fresh — the catalog evolves; what's stub today may be shipped tomorrow.
+
+---
+
 ## Composing shapes
 
 Shapes can nest. A user request like "Build me an app to manage book reviews, then write a blog post announcing it" combines Shape 2 (Idea → Spec → Build) with Shape 3 (single deliverable with prep). The orchestrator's job is to surface this combination in the plan so the user sees the full arc and approves before execution.
+
+Shape 5 (Agent group) commonly composes *upward* of the others — the agent's workflow itself uses Shapes 1–4 internally. For example, `lifecycle-pilot`'s Phase 2 (specification) is a Shape 2 chain run inside Phase 2 of the agent's larger arc. Don't double-report shapes in the plan; report at the *outermost* shape and let the agent's AGENT.md describe its internals.
 
 When composing, keep the consolidated intake tight — combine questions across shapes where they share a decision (e.g., the language and tone for both the app's UI and the blog post can be one question if they should match).
 

@@ -42,9 +42,11 @@ Throughout all four phases, keep the three companion skills active in the backgr
 
 If a workflow runs to completion without any of these companion skills firing, that is a signal — most multi-skill workflows touch at least one load-bearing term and at least one durable fact.
 
-### Phase 1 — Read the catalog
+### Phase 1 — Read the catalog (skills AND agents)
 
 The available skills are listed in the system prompt under `<available_skills>`. Each entry has a name, a description, and a SKILL.md path. Before planning anything, scan that list and identify every skill whose description plausibly relates to the user's request.
+
+**Then check `agents/CHECKLIST.md` for shipped agents.** Agents are named roles that bundle a workflow + skills + deliverables for a specific job. When an agent's `fires_on` triggers match the request, **prefer the agent over re-planning the chain from skills** — the agent's workflow is a tested, named chain that survives sessions.
 
 Two rules:
 
@@ -52,6 +54,21 @@ Two rules:
 - **If relevance is unclear, view the SKILL.md.** A two-line description hides nuance. Spend the tool call to confirm before including or excluding a borderline skill.
 
 Also check whether the system prompt has any user-loaded skills (often under `/mnt/skills/user/`) — these are usually more specific to the user's domain and should be preferred over public ones when both could apply.
+
+### Phase 1b — Agent preference (when applicable)
+
+Agents live under `agents/<name>/AGENT.md`. The current catalogue is in `agents/CHECKLIST.md` (read it fresh; don't hardcode).
+
+Decision flow for whether to engage an agent:
+
+1. Does the request's intent match any agent's `fires_on` triggers? (Read the agent's AGENT.md frontmatter; the `fires_on` list is the matching surface.)
+2. If exactly one agent matches → invoke that agent by name; its workflow is the plan.
+3. If multiple agents match → engage `scenario-strategist`; it forms a group via `agent-group-formation`.
+4. If no agent matches → fall back to skill-level orchestration (Phases 2–4 below).
+
+Single-agent invocation looks like: *"This matches the lifecycle-pilot agent — its workflow is X phases; here's the consolidated intake."* The agent's AGENT.md is the workflow definition; this orchestrator's job is to surface inputs upfront so the agent doesn't ping the user mid-phase.
+
+When invoking by agent, the consolidated intake (Phase 3) covers inputs needed across the *whole agent arc*, not just the first phase.
 
 ### Phase 2 — Plan the workflow
 
@@ -147,6 +164,17 @@ These show the consolidation principle in action.
 **Not obvious:** stack, scope, languages, target platform.
 **Worth asking (cap at 3):** stack preference (Python+React / Node+React / Go+React), scope (prototype only / MVP / full v1), UI language (English only / English + Traditional Chinese).
 **Plan shown:** `project-prototype` → `project-docs` → `task-breakdown` → `project-frontend` + chosen backend.
+
+**User:** "I want to build a SaaS for X and launch it."
+**This matches `lifecycle-pilot`'s `fires_on`** ("said with launch intent (not just prototype)").
+**Preferred routing:** invoke the `lifecycle-pilot` agent; its AGENT.md is the workflow.
+**Worth asking (cap at 3 across the whole arc):** backend language; launch posture (closed/open/public beta); compliance regime.
+**Plan shown:** lifecycle-pilot's 7-phase arc (prototype → docs → task-breakdown → frontend+backend → launch-readiness → GTM → public launch).
+
+**User:** "Plan our re-architecture from monolith to services and the relaunch as v2."
+**This needs ≥2 agents** (`architecture-shepherd` + `lifecycle-pilot` + `devops-engineer` as supporter). Multiple agents → engage `scenario-strategist`.
+**Preferred routing:** invoke `scenario-strategist`; its four-phase arc (analysis → workflow → group → handoffs) staffs and contracts the multi-agent group.
+**Plan shown:** scenario-strategist arc → formed group executes (typically Scenario R from SCENARIOS.md).
 
 **User:** "Summarize the uploaded meeting notes and turn them into a slide deck for tomorrow's board meeting."
 **Already obvious:** notes attached, output is .pptx, audience is the board.

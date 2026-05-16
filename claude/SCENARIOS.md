@@ -589,6 +589,389 @@ just disciplined markdown editing.
 
 ---
 
+## Scenario M — Taking an idea all the way to launch (lifecycle-pilot)
+
+**Goal.** Drive a product from concept through production code to
+public launch as one coordinated arc. The full eight-skill linear
+chain plus the GTM tail (launch readiness, positioning, pricing,
+marketing site, beta program, analytics).
+
+### When this fits
+
+- *"I want to build X and launch it."* (not just "build me a
+  prototype").
+- You have an MVP codebase and now need launch readiness + GTM
+  before going public.
+- The product needs the seam between *"code is done"* and *"product
+  is launched"* held by a single owner.
+
+### Procedure
+
+The full seven-phase arc owned by [`lifecycle-pilot`](agents/lifecycle-pilot/AGENT.md):
+
+1. **Ideation** → `project-prototype` produces clickable React mock.
+2. **Specification** → `project-docs` (asks backend language) +
+   `create-project-instruction` Mode C.
+3. **Validation** (optional) → `project-mockup-app`.
+4. **Planning** → `task-breakdown`.
+5. **Production code** (parallel) → `project-frontend` +
+   `project-backend-{node|go|python}`.
+6. **Launch readiness** → `gtm-launch-readiness` audit (FAIL rows
+   block launch).
+7. **Go-to-market** (parallel) → `gtm-positioning` →
+   `gtm-pricing-model` → `gtm-marketing-site`; `gtm-beta-program`;
+   `gtm-analytics-instrumentation`.
+
+Hand-off agents engage as needed: `devops-engineer` from Phase 5 on;
+`architecture-shepherd` if Phase 2 surfaces a non-trivial
+architectural decision; `knowledge-curator` if Phase 8 publishes a
+public KB.
+
+### Skills involved — checklist
+
+| Skill / Agent | Status | Role |
+|---|---|---|
+| `lifecycle-pilot` (agent) | shipped | Conductor across all phases. |
+| `project-prototype`, `project-docs`, `project-mockup-app`, `task-breakdown`, `project-frontend`, `project-backend-{node,go,python}`, `create-project-instruction` | shipped | Phases 1–5 producers. |
+| `gtm-launch-readiness` | shipped | Phase 6 — opinionated pre-launch audit. |
+| `gtm-positioning`, `gtm-pricing-model`, `gtm-marketing-site`, `gtm-beta-program`, `gtm-analytics-instrumentation` | shipped | Phase 7 — GTM artifacts. |
+| `requirement-audit` | shipped | Gates Phases 6 + 8. |
+| `cognitive-alignment`, `memory-ontology`, `compact-ritual` | shipped | Cross-phase. |
+| `devops-engineer`, `architecture-shepherd`, `knowledge-curator` (agents) | shipped | Hand-offs per phase. |
+
+Gaps: 0. Recommended next step: invoke the agent by name —
+*"Use the lifecycle-pilot agent to take this idea through to
+launch."*
+
+---
+
+## Scenario N — Multi-agent coordination (scenario-strategist)
+
+**Goal.** A complex situation needs more than one agent — analyse
+the scenario, design the workflow, form the right agent group,
+contract the handoffs.
+
+### When this fits
+
+- *"We're going to re-architect the platform and re-launch."*
+- *"Migrate to Kubernetes while we ship v2."*
+- *"Build the enterprise KB and use it to power the AI features
+  we promised customers."*
+- A scenario that needs ≥2 agents in coordinated motion.
+
+### Procedure
+
+The four-phase strategist arc owned by [`scenario-strategist`](agents/scenario-strategist/AGENT.md):
+
+1. **Analysis** → `scenario-analysis` locks the brief (goal /
+   scope / constraints / success criteria) and produces an
+   options analysis (2–4 weighted options + recommendation).
+2. **Workflow design** → `workflow-design` produces 3–7 phases
+   with deliverables, gates, critical path, parallelism, sync
+   points.
+3. **Group formation** → `agent-group-formation` reads
+   `agents/CHECKLIST.md` fresh; one lead per phase; named
+   conductor; missing-role gaps surfaced.
+4. **Handoff protocols** → `agent-handoff-protocol` fills the
+   six-field contract per transition (producer / receiver /
+   artifact / acceptance / rejection / escalation).
+
+The conductor (often the strategist itself) tracks the workflow
+across phases and enforces the handoff contracts.
+
+### Skills involved — checklist
+
+| Skill / Agent | Status | Role |
+|---|---|---|
+| `scenario-strategist` (agent) | shipped | Conductor for the four-phase strategist arc. |
+| `scenario-analysis` | shipped | Phase 1 — brief + options + recommendation. |
+| `workflow-design` | shipped | Phase 2 — agent-level phases + gates. |
+| `agent-group-formation` | shipped | Phase 3 — staffing. |
+| `agent-handoff-protocol` | shipped | Phase 4 — handoff contracts. |
+| `cognitive-alignment` | shipped | Non-negotiable in Phase 1. |
+| `memory-ontology` | shipped | Persists brief + decision + group. |
+| `requirement-audit` | shipped | Verifies workflow deliverables at end. |
+| `skill-orchestrator` | shipped | Used inside phases for skill-level chains. |
+
+Gaps: 0. Recommended next step: *"Use the scenario-strategist
+agent to design how we'll handle <complex situation>."*
+
+---
+
+## Scenario O — Operational baseline + ongoing ops (devops-engineer)
+
+**Goal.** Establish or extend the operational stack — CI/CD, IaC,
+observability, runbooks, releases, security, secrets — for a
+project. Seven concurrent workstreams, engaged à la carte; not all
+seven at once.
+
+### When this fits
+
+- New project preparing for prod — needs the full kit.
+- Existing project missing one or more workstreams (no
+  observability; ad-hoc deploys; no runbooks).
+- Post-incident — extend an existing workstream (e.g. tighten
+  alerts or add a new runbook class).
+
+### Procedure
+
+Engage the workstreams the project needs from [`devops-engineer`](agents/devops-engineer/AGENT.md):
+
+1. **CI/CD** → `devops-ci-cd` — on-PR + on-merge + on-approval
+   pipeline; per-platform template; cache discipline; required
+   checks; vault integration.
+2. **IaC** → `devops-iac` — Terraform-default; per-cloud baseline;
+   plan-not-apply gate; tag discipline.
+3. **Observability** → `devops-observability` — OpenTelemetry +
+   RED/USE metrics + SLO burn-rate alerts; golden-signals
+   dashboards per service.
+4. **Incident runbooks** → `devops-incident-runbook` — fixed-shape
+   runbooks (Detect → Diagnose → Mitigate → Recover → Postmortem);
+   quarterly game-day rehearsals.
+5. **Release management** → `devops-release-management` — cadence
+   + freezes + approvals + versioning + rollback procedures +
+   communication.
+6. **Security hardening** → `devops-security-hardening` — 8-
+   category pre-prod audit (SBOM / scans / auth / TLS / OWASP)
+   with PASS/PARTIAL/FAIL and waiver discipline.
+7. **Secrets** → `devops-secrets` — vault choice; per-class
+   rotation; ACLs; audit + anomaly alerts; emergency rotation
+   runbook.
+
+### Skills involved — checklist
+
+| Skill / Agent | Status | Role |
+|---|---|---|
+| `devops-engineer` (agent) | shipped | Conductor for engaged workstreams. |
+| `devops-ci-cd`, `devops-iac`, `devops-observability`, `devops-incident-runbook`, `devops-release-management`, `devops-security-hardening`, `devops-secrets` | shipped | Per-workstream producers. |
+| Language `*-testing` / `*-linting` skills | shipped | Supply CI commands. |
+| `requirement-audit` | shipped | Per-workstream deliverable verification. |
+| `memory-ontology` | shipped | Persists operational decisions. |
+| `lifecycle-pilot`, `architecture-shepherd` (agents) | shipped | Hand-offs (launch readiness; rollout gates). |
+
+Gaps: 0. Recommended next step: *"Use the devops-engineer agent
+to set up <workstream(s)> for this project."*
+
+---
+
+## Scenario P — Architecture upgrade (architecture-shepherd)
+
+**Goal.** Steward an architectural upgrade end-to-end — assess
+honestly, decide deliberately, plan in reversible phases, roll
+out with metric gates, communicate to downstream consumers.
+
+### When this fits
+
+- *"Should we split this monolith?"*
+- *"Move from REST to gRPC."*
+- *"Upgrade Postgres major version."*
+- *"Plan the rollout for the new auth service."*
+- *"We're deprecating v1 of the public API."*
+
+### Procedure
+
+The five-phase shepherd arc from [`architecture-shepherd`](agents/architecture-shepherd/AGENT.md):
+
+1. **Assessment** → `arch-assessment` — current-state diagram +
+   pain points + risk register + 3+ options matrix (always with
+   Option 0); inferred-vs-confirmed discipline mandatory.
+2. **Decision** — human decision authority picks; rationale
+   recorded via `memory-ontology`.
+3. **Migration plan** → `arch-migration-plan` (general) OR
+   `arch-dependency-upgrade` (specialised variant for major dep
+   bumps) — 3–8 phases with reversible checkpoints, named
+   owners, interface locks, per-phase test plans.
+4. **Rollout** → `arch-rollout-strategy` — pick among 5 strategies
+   (big-bang / blue-green / canary / dark-launch / feature-
+   flagged); metric gates tied to SLOs; automatic abort
+   conditions; scripted per-stage rollback.
+5. **Comms + record** → `arch-breaking-change-comms` — audience-
+   specific drafts (internal / customers / API consumers); sunset
+   escalation pattern; update INSTRUCTIONS/projects/<slug>/ to
+   reflect new stack.
+
+Hand off to `devops-engineer` for CI/CD + observability + runbook
+work during rollout. Hand off to `knowledge-curator` for public
+KB / docs updates.
+
+### Skills involved — checklist
+
+| Skill / Agent | Status | Role |
+|---|---|---|
+| `architecture-shepherd` (agent) | shipped | Conductor across the 5-phase arc. |
+| `arch-assessment`, `arch-migration-plan`, `arch-dependency-upgrade`, `arch-rollout-strategy`, `arch-breaking-change-comms` | shipped | Per-phase producers. |
+| `project-knowledge-base` | shipped | Pulls current architecture map for assessment. |
+| `cognitive-alignment` | shipped | Lock service / tenant / queue / region terms. |
+| `memory-ontology` | shipped | Records architectural decisions. |
+| `requirement-audit` | shipped | Gates every phase transition. |
+| `devops-engineer`, `knowledge-curator` (agents) | shipped | Hand-offs (rollout infra; public docs). |
+
+Gaps: 0. Recommended next step: *"Use the architecture-shepherd
+agent to assess and plan <architectural change>."*
+
+---
+
+## Scenario Q — Enterprise knowledge base (knowledge-curator)
+
+**Goal.** Build, merge, refresh, and govern a multi-project
+enterprise knowledge base with search and access control —
+turning isolated per-project KBs into a governed enterprise
+knowledge graph.
+
+### When this fits
+
+- *"Build the enterprise KB."*
+- *"Merge the project KBs into one canonical layer."*
+- *"Set up RAG over our docs for the new AI features."*
+- *"How do we keep the KB fresh?"*
+- *"We need access control on the KB."*
+
+### Procedure
+
+The five-workstream curator arc from [`knowledge-curator`](agents/knowledge-curator/AGENT.md):
+
+1. **Architecture** → `enterprise-kb-architecture` — 7-domain
+   default taxonomy; entity contract; promotion + sunset
+   criteria. **Foundational — must be locked before merging.**
+2. **Merge** → `enterprise-kb-merge` — per-entity decision tree;
+   explicit conflict surfacing; cross-reference rewriting; alias
+   capture; versioned merge reports.
+3. **Refresh policy** → `enterprise-kb-refresh-policy` — per-
+   entity-type staleness rules; mandatory ownership; automatic
+   + manual triggers; soft/hard sunset; unowned-entity governance.
+4. **Search index** → `enterprise-kb-search-index` — shared
+   retrieval client; context-preserving chunking; hybrid
+   dense+BM25 + reranking; ACL enforcement at retrieval.
+5. **Access control** → `enterprise-kb-access-control` — 5-level
+   classification; internal default; per-classification
+   redaction; audit log + anomaly alerts; quarterly access
+   audits.
+
+Hand off to `devops-engineer` for vector DB hosting + audit log
+infrastructure. Hand off to `lifecycle-pilot` for AI features
+consuming the index.
+
+### Skills involved — checklist
+
+| Skill / Agent | Status | Role |
+|---|---|---|
+| `knowledge-curator` (agent) | shipped | Conductor across the 5 workstreams. |
+| `enterprise-kb-architecture`, `enterprise-kb-merge`, `enterprise-kb-refresh-policy`, `enterprise-kb-search-index`, `enterprise-kb-access-control` | shipped | Per-workstream producers. |
+| `project-knowledge-base` | shipped | Per-project KB source. |
+| `book-to-knowledge-graph`, `ontology-extraction`, `ontology-merging`, `ontology-storage`, `ontology-qa` | shipped | Long-text source pipeline. |
+| `cognitive-alignment` | shipped | Cross-project terminology alignment. |
+| `memory-ontology` | shipped | Promotes durable facts to canonical entities. |
+| `devops-engineer`, `lifecycle-pilot` (agents) | shipped | Hand-offs (infra; AI features). |
+
+Gaps: 0. Recommended next step: *"Use the knowledge-curator
+agent to design the enterprise KB architecture."*
+
+---
+
+## Scenario R — Re-architecture + relaunch (multi-agent)
+
+**Goal.** A change that spans architecture, ops, and product/GTM
+simultaneously — for example, re-platforming an existing product
+and relaunching it as v2.
+
+### When this fits
+
+- *"Re-architect to event-driven and relaunch as v2."*
+- *"Migrate to Kubernetes during the v2 launch window."*
+- Any scenario that needs the architecture + lifecycle + devops
+  agents working in concert.
+
+### Procedure
+
+`scenario-strategist` forms the group; the four-phase strategist
+arc (Scenario N) precedes the work:
+
+1. **Brief + options + decision** via `scenario-analysis`.
+2. **Workflow design** via `workflow-design` — typically
+   sequential overall (architecture → relaunch) with parallel
+   tracks within each phase.
+3. **Group formation** via `agent-group-formation`:
+   - Architecture phases: `architecture-shepherd` lead;
+     `devops-engineer` supports.
+   - Launch phases: `lifecycle-pilot` lead; `devops-engineer`
+     + `architecture-shepherd` (steady-state) support.
+   - Conductor: `scenario-strategist`.
+4. **Handoffs** via `agent-handoff-protocol` — between
+   architecture and lifecycle (typically the cutover phase →
+   "ready for launch readiness audit").
+
+Then execute Scenario P → Scenario O (ops touch-points) →
+Scenario M for the relaunch portion.
+
+### Skills involved — checklist
+
+| Skill / Agent | Status | Role |
+|---|---|---|
+| `scenario-strategist` (agent) | shipped | Conductor across the multi-agent group. |
+| `scenario-analysis`, `workflow-design`, `agent-group-formation`, `agent-handoff-protocol` | shipped | Group-formation arc. |
+| `architecture-shepherd` (agent) | shipped | Lead — architecture phases. |
+| `lifecycle-pilot` (agent) | shipped | Lead — relaunch phases. |
+| `devops-engineer` (agent) | shipped | Supports both (ops gates + observability). |
+| `cognitive-alignment`, `memory-ontology`, `compact-ritual` | shipped | Cross-arc (long-lived workflow). |
+| `requirement-audit` | shipped | Per-handoff acceptance verification. |
+
+Gaps: 0. Recommended next step: *"Use the scenario-strategist
+agent to form the group for our re-architecture + relaunch."*
+
+---
+
+## Scenario S — Enterprise KB + AI feature launch (multi-agent)
+
+**Goal.** Build the enterprise knowledge base and ship the AI
+features that consume it in coordinated motion — common pattern
+where the AI feature is the *reason* the enterprise KB is being
+built.
+
+### When this fits
+
+- *"Build the enterprise KB and use it to power the AI features
+  we promised customers."*
+- New AI product whose value depends on retrieval over the
+  enterprise knowledge graph.
+
+### Procedure
+
+`scenario-strategist` forms the group (Scenario N precedes).
+
+Then in coordinated phases:
+
+1. **KB architecture** (`knowledge-curator` lead) — establish
+   taxonomy + entity contract before anything else.
+2. **Merge + access control + initial index** (`knowledge-curator`
+   lead; `devops-engineer` supports for index hosting) — produces
+   the queryable canonical layer.
+3. **AI feature design + build** (`lifecycle-pilot` lead;
+   `knowledge-curator` supports for retrieval-client API) — the
+   feature consumes the shared retrieval client.
+4. **Launch readiness + GTM** (`lifecycle-pilot` lead;
+   `knowledge-curator` supports for public-docs slice;
+   `devops-engineer` supports for ops baseline).
+5. **Refresh policy + ongoing ownership** (`knowledge-curator`
+   lead; persists past launch).
+
+### Skills involved — checklist
+
+| Skill / Agent | Status | Role |
+|---|---|---|
+| `scenario-strategist` (agent) | shipped | Group conductor. |
+| `knowledge-curator` (agent) | shipped | KB lead; AI-feature retrieval-client partner. |
+| `lifecycle-pilot` (agent) | shipped | AI feature lead. |
+| `devops-engineer` (agent) | shipped | Vector DB hosting; AI-feature CI/CD; ops baseline. |
+| `enterprise-kb-architecture`, `enterprise-kb-merge`, `enterprise-kb-search-index`, `enterprise-kb-access-control`, `enterprise-kb-refresh-policy` | shipped | Per-workstream KB producers. |
+| `agent-group-formation`, `agent-handoff-protocol` | shipped | Define the KB ↔ AI-feature handoff contract. |
+| `requirement-audit` | shipped | Per-handoff acceptance. |
+| `memory-ontology` | shipped | Persists KB + AI feature decisions. |
+
+Gaps: 0. Recommended next step: *"Use the scenario-strategist
+agent to form a group for our enterprise KB + AI feature launch."*
+
+---
+
 ## Appendix — Checklists
 
 Aggregated quick-reference of which skills exist (✓), which are project-specific
@@ -703,10 +1086,33 @@ as the template and update the relevant scenarios above.
 
 ---
 
+## Agents — quick reference
+
+The framework ships **five agents** under `agents/`. Each agent is a
+named role bundling a workflow + skills + deliverables for a specific
+job. The scenarios above (M–S) document the characteristic arc per
+agent and the common multi-agent compositions.
+
+| Agent | Focus | Single-agent scenario | Multi-agent appearances |
+|---|---|---|---|
+| [`lifecycle-pilot`](agents/lifecycle-pilot/AGENT.md) | Prototype → Prod → Go-to-Market | [M](#scenario-m--taking-an-idea-all-the-way-to-launch-lifecycle-pilot) | R, S |
+| [`scenario-strategist`](agents/scenario-strategist/AGENT.md) | Scenario analysis + workflow + group formation | [N](#scenario-n--multi-agent-coordination-scenario-strategist) | R, S |
+| [`devops-engineer`](agents/devops-engineer/AGENT.md) | CI/CD, IaC, observability, runbooks, releases, security, secrets | [O](#scenario-o--operational-baseline--ongoing-ops-devops-engineer) | M, P, R, S |
+| [`architecture-shepherd`](agents/architecture-shepherd/AGENT.md) | Architecture upgrade support | [P](#scenario-p--architecture-upgrade-architecture-shepherd) | R |
+| [`knowledge-curator`](agents/knowledge-curator/AGENT.md) | Enterprise knowledge base upgrade | [Q](#scenario-q--enterprise-knowledge-base-knowledge-curator) | S |
+
+See [agents/README.md](agents/README.md) for the agents layer rationale
+and [agents/CHECKLIST.md](agents/CHECKLIST.md) for build status of every
+agent + its dependent skills.
+
+---
+
 ## See also
 
 - [README.md](README.md) — framework overview.
 - [HOWTO.md](HOWTO.md) — everyday mechanics.
+- [agents/README.md](agents/README.md) — agents layer overview.
+- [agents/CHECKLIST.md](agents/CHECKLIST.md) — agents + new-skills progress.
 - `INSTRUCTIONS/README.md` — universal instructions overview.
 - `skills/ideas/WORKFLOW.md` — the project quick-start narrative.
 - `skills/share/skill-orchestrator/SKILL.md` — orchestration logic.

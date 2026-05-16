@@ -1,0 +1,130 @@
+{
+  "_comment": "Grafana golden-signals dashboard spec. Import via Dashboards > Import. Replace <service> and <datasource>. RED + USE + SLO panels.",
+  "title": "Golden Signals — <service>",
+  "tags": ["golden-signals", "<service>"],
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Request rate (RED-R)",
+      "type": "timeseries",
+      "datasource": "<datasource>",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{job=\"<service>\"}[5m]))",
+          "legendFormat": "req/s"
+        }
+      ]
+    },
+    {
+      "title": "Error rate by status class (RED-E)",
+      "type": "timeseries",
+      "datasource": "<datasource>",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{job=\"<service>\",status=~\"4..\"}[5m]))",
+          "legendFormat": "4xx"
+        },
+        {
+          "expr": "sum(rate(http_requests_total{job=\"<service>\",status=~\"5..\"}[5m]))",
+          "legendFormat": "5xx"
+        }
+      ]
+    },
+    {
+      "title": "Latency p50 / p95 / p99 (RED-D)",
+      "type": "timeseries",
+      "datasource": "<datasource>",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{job=\"<service>\"}[5m])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"<service>\"}[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"<service>\"}[5m])) by (le))",
+          "legendFormat": "p99"
+        }
+      ]
+    },
+    {
+      "title": "CPU utilization (USE-U)",
+      "type": "timeseries",
+      "datasource": "<datasource>",
+      "targets": [
+        {
+          "expr": "avg(rate(container_cpu_usage_seconds_total{job=\"<service>\"}[5m]))",
+          "legendFormat": "CPU"
+        }
+      ]
+    },
+    {
+      "title": "Memory utilization (USE-U)",
+      "type": "timeseries",
+      "datasource": "<datasource>",
+      "targets": [
+        {
+          "expr": "avg(container_memory_working_set_bytes{job=\"<service>\"} / container_spec_memory_limit_bytes{job=\"<service>\"})",
+          "legendFormat": "Memory % of limit"
+        }
+      ]
+    },
+    {
+      "title": "In-flight requests (USE-S)",
+      "type": "timeseries",
+      "datasource": "<datasource>",
+      "targets": [
+        {
+          "expr": "sum(http_requests_in_flight{job=\"<service>\"})",
+          "legendFormat": "in-flight"
+        }
+      ]
+    },
+    {
+      "title": "SLO burn-rate (5m and 1h windows)",
+      "type": "timeseries",
+      "datasource": "<datasource>",
+      "targets": [
+        {
+          "expr": "slo_error_budget_burn_rate{slo=\"<slo-name>\",window=\"5m\"}",
+          "legendFormat": "burn 5m"
+        },
+        {
+          "expr": "slo_error_budget_burn_rate{slo=\"<slo-name>\",window=\"1h\"}",
+          "legendFormat": "burn 1h"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 6},
+              {"color": "red", "value": 14.4}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Dependency error rate",
+      "type": "timeseries",
+      "datasource": "<datasource>",
+      "targets": [
+        {
+          "expr": "sum by (dependency) (rate(downstream_calls_total{job=\"<service>\",status=\"error\"}[5m]))",
+          "legendFormat": "{{dependency}} errors"
+        }
+      ]
+    }
+  ],
+  "_notes": [
+    "Replace <service>, <datasource>, <slo-name> per service.",
+    "RED = Rate / Errors / Duration. USE = Utilization / Saturation / Errors.",
+    "p99 latency is the hardest gate — small regressions surface in the tail first.",
+    "SLO burn-rate panel includes color thresholds for the multi-window-multi-burn-rate alert thresholds (yellow at 6x slow-burn; red at 14.4x fast-burn).",
+    "Add a Dependency Errors panel for each critical downstream (Postgres, Redis, Stripe, etc.)."
+  ]
+}

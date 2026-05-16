@@ -1,0 +1,152 @@
+{
+  "_comment": "Beta intake form schema. Questions map to ICP fields from positioning-brief.md. Each candidate is scored against ICP (0-3 per field); top N scorers are admitted to closed beta.",
+  "version": 1,
+  "title": "Join the beta",
+  "description": "We're inviting a small group of early users to help shape the product. Tell us a bit about yourself so we can pick the best fit.",
+  "questions": [
+    {
+      "id": "email",
+      "label": "Work email",
+      "type": "email",
+      "required": true,
+      "icp_field": null,
+      "validation": "must be a real domain (not gmail/yahoo if B2B)"
+    },
+    {
+      "id": "first_name",
+      "label": "First name",
+      "type": "text",
+      "required": true,
+      "icp_field": null
+    },
+    {
+      "id": "company_name",
+      "label": "Company / project name",
+      "type": "text",
+      "required": true,
+      "icp_field": "firmographic"
+    },
+    {
+      "id": "role",
+      "label": "Your role",
+      "type": "select",
+      "options": [
+        "Engineering (IC)",
+        "Engineering Manager / Lead",
+        "Product Manager",
+        "Designer",
+        "Founder / CEO",
+        "Operations / SRE",
+        "Security",
+        "Other"
+      ],
+      "required": true,
+      "icp_field": "demographic"
+    },
+    {
+      "id": "company_size",
+      "label": "Company size",
+      "type": "select",
+      "options": [
+        "Just me",
+        "2-10",
+        "11-50",
+        "51-200",
+        "201-1000",
+        "1000+"
+      ],
+      "required": true,
+      "icp_field": "firmographic"
+    },
+    {
+      "id": "current_solution",
+      "label": "What do you use today to solve this problem?",
+      "type": "text",
+      "required": true,
+      "icp_field": "behavioural",
+      "scoring_hint": "Free-form; classify into existing-tool / hand-rolled / nothing"
+    },
+    {
+      "id": "trigger",
+      "label": "What made you sign up for the beta today?",
+      "type": "text",
+      "required": true,
+      "icp_field": "trigger",
+      "scoring_hint": "Free-form; classify into pain-triggered / curiosity / referral / no-clear-trigger"
+    },
+    {
+      "id": "expected_use",
+      "label": "How do you imagine using this in your work?",
+      "type": "long_text",
+      "required": true,
+      "icp_field": "problem",
+      "scoring_hint": "Look for specificity; vague answers score low"
+    },
+    {
+      "id": "commit_feedback",
+      "label": "Willing to commit to a 15-min weekly check-in for the duration of the beta?",
+      "type": "boolean",
+      "required": true,
+      "icp_field": null,
+      "scoring_hint": "Filter — beta-must-have; score 0 = reject"
+    },
+    {
+      "id": "nda_acknowledgement",
+      "label": "I understand the beta is not public; product details should be kept confidential.",
+      "type": "boolean",
+      "required": true,
+      "icp_field": null,
+      "scoring_hint": "Filter; score 0 = reject (if NDA applies)"
+    },
+    {
+      "id": "referrer",
+      "label": "How did you hear about us? (optional)",
+      "type": "text",
+      "required": false,
+      "icp_field": null
+    },
+    {
+      "id": "anything_else",
+      "label": "Anything else you'd like us to know? (optional)",
+      "type": "long_text",
+      "required": false,
+      "icp_field": null
+    }
+  ],
+  "scoring": {
+    "rubric": {
+      "0": "doesn't match ICP at all",
+      "1": "partial match",
+      "2": "good match",
+      "3": "strong ICP fit"
+    },
+    "weights": {
+      "firmographic": 2,
+      "demographic": 2,
+      "behavioural": 3,
+      "trigger": 3,
+      "problem": 3
+    },
+    "filter_questions": [
+      "commit_feedback",
+      "nda_acknowledgement"
+    ],
+    "reject_signals": [
+      "competitor_employee",
+      "anti_icp_match",
+      "filter_question_false"
+    ]
+  },
+  "post_submission": {
+    "thank_you_message": "Thanks for applying. We're reviewing applications weekly. You'll hear from us within 7 days whether you're in this cohort or on the waitlist.",
+    "expected_review_window_days": 7,
+    "follow_up_template": "templates/beta-decision-email.md"
+  },
+  "_implementation_notes": [
+    "Backend stores applications in 'beta_applications' table.",
+    "Scoring happens manually (1-3 per field) by beta program owner; cohort fills with top N scorers.",
+    "Auto-reject for filter_questions returning false.",
+    "Auto-reject for anti_icp_match (e.g. employee of named competitor).",
+    "Permission to use email + name + company in beta logo grid: separate consent at sign-up if applicable."
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: scenario-checklist
-description: Produce a per-scenario skills checklist for any workflow — list the skills that will (or should) participate, their role in that scenario, their availability status (shipped / project-specific / missing), and any gaps that need filling before the workflow can run. Output mirrors the "Skills involved — checklist" tables in SCENARIOS.md and is the canonical format for adding a new scenario or for surfacing the plan before execution. Use this skill when authoring a new scenario for SCENARIOS.md, when a user asks "what skills will this use?", when planning a workflow that has not been done before, or when reviewing whether the framework can handle a proposed workflow. Reads the skill catalog at runtime — does not hardcode skill lists. Pairs with skill-orchestrator (which uses the checklist to plan execution) and with requirement-audit (which uses scenario-checklist output as one form of evidence).
+description: Produce a per-scenario skills (and agents) checklist for any workflow — list the skills/agents that will participate, their role, their availability status (shipped / project-specific / missing), and any gaps before the workflow can run. Output mirrors the "Skills involved — checklist" tables in SCENARIOS.md. Two formats: 3-column (skill-only scenarios) and 4-column with an Agent column (agent-aware scenarios). Use this skill when authoring a new scenario for SCENARIOS.md, when a user asks "what skills will this use?", when planning a workflow that has not been done before, or when reviewing whether the framework can handle a proposed workflow. Reads both the skill catalog AND agents/CHECKLIST.md at runtime — does not hardcode skill or agent lists. Pairs with skill-orchestrator (which uses the checklist to plan execution and to route to named agents), with requirement-audit (which uses scenario-checklist output as one form of evidence), and with agent-group-formation (which uses the same row format at agent granularity).
 ---
 
 # Scenario Checklist
@@ -30,6 +30,8 @@ apply, mark gaps. This skill encodes that operation.
 The deliverable is a markdown table plus a short summary, matching the
 format used throughout `SCENARIOS.md`.
 
+### Default 3-column format (skill-only scenarios)
+
 ```markdown
 ### Skills involved — checklist
 
@@ -41,7 +43,55 @@ format used throughout `SCENARIOS.md`.
 Gaps: <count of missing skills>. Recommended next step: <one concrete action>.
 ```
 
-Status vocabulary (fixed; do not invent new statuses):
+### 4-column format (agent-aware scenarios)
+
+When **one or more agents** participate in the scenario, add an `Agent`
+column that names the owning agent for each row (or `–` if the row is
+not owned by a specific agent). Use this format for any scenario
+involving the agents from `agents/CHECKLIST.md`.
+
+```markdown
+### Skills involved — checklist
+
+| Skill / Agent | Status | Agent | Role |
+|---|---|---|---|
+| `lifecycle-pilot` (agent) | shipped | – | Conductor across phases. |
+| `project-prototype` | shipped | `lifecycle-pilot` | Phase 1 — clickable React mock. |
+| `gtm-launch-readiness` | shipped | `lifecycle-pilot` | Phase 6 — pre-launch audit. |
+| `requirement-audit` | shipped | – | Gates Phase 6. |
+| `cognitive-alignment` | shipped | – | Cross-phase meta-skill. |
+
+Agents: <list>. Gaps: <count of missing skills/agents>.
+Recommended next step: <one concrete action>.
+```
+
+**Rules for the Agent column:**
+
+- An agent's *own* row has `–` in the Agent column (the agent is the
+  owner; it doesn't own itself).
+- A skill row's Agent column names the agent in whose AGENT.md it
+  appears under `skills_used` (typically one agent; if a skill is
+  shared across agents, name the *primary* owner — usually the one
+  whose `fires_on` triggers most directly invoke the skill).
+- Meta-skills (`cognitive-alignment`, `memory-ontology`,
+  `compact-ritual`, `skill-orchestrator`, `requirement-audit`) get
+  `–` since they're cross-cutting.
+- If a row is `missing`, the Agent column names the agent that
+  *would* own the missing skill if it existed.
+
+### When to use which format
+
+| Format | Use when |
+|---|---|
+| 3-column | Scenario uses only skills from `skills/share/`, `dev-*/`, `ideas/`, `knowledge-graph/`, etc. without invoking a named agent. |
+| 4-column | Scenario involves any of the 5 agents (`lifecycle-pilot`, `architecture-shepherd`, `scenario-strategist`, `devops-engineer`, `knowledge-curator`). |
+
+When in doubt, prefer 4-column — the extra column is cheap and the
+agent visibility is valuable.
+
+## Status vocabulary
+
+Fixed; do not invent new statuses:
 
 - **shipped** — exists in the framework and applies generically.
 - **project-specific** — exists but only applies to one project (lives
@@ -65,27 +115,40 @@ Get a one-paragraph statement of the workflow being checklisted:
 If anchoring is unclear, run a **cognitive-alignment** check before
 proceeding. A vague scenario produces a vague checklist.
 
-### Phase 2 — Read the catalog
+### Phase 2 — Read the catalog (skills AND agents)
 
-The skill catalog is enumerated in the system prompt under
-`<available_skills>` (or equivalent harness mechanism). Read every entry's
-description, not just the names — see `skill-orchestrator/SKILL.md` Phase 1
-for the same discipline.
+Two catalogs:
 
-Identify every skill whose description plausibly applies to the scenario.
-Borderline skills get included with a note rather than excluded silently.
+1. **Skills** — enumerated in the system prompt under `<available_skills>`
+   (or equivalent harness mechanism). Read every entry's description, not
+   just the names — see `skill-orchestrator/SKILL.md` Phase 1 for the
+   same discipline.
+2. **Agents** — enumerated in `agents/CHECKLIST.md`. Read the per-agent
+   `fires_on` triggers (from each AGENT.md frontmatter) and `skills_used`
+   lists to know which agents participate and which skills they own.
+
+Identify every skill **and every agent** whose description / triggers
+plausibly apply to the scenario. Borderline candidates get included with
+a note rather than excluded silently.
+
+If **any** agent participates, switch to the 4-column output format.
 
 ### Phase 3 — Decompose into roles
 
 Split the scenario into discrete sub-tasks. Each sub-task maps to one or
-more skills:
+more skills (and possibly an owning agent):
 
+- **Agents** — named roles that conduct multi-phase work (the 5 agents
+  under `agents/`). When an agent participates, list its own row first
+  with `Agent: –` (the agent owns; it doesn't own itself).
 - **Producer skills** — produce a deliverable (project-frontend,
-  task-breakdown, create-project-instruction).
+  task-breakdown, create-project-instruction). When owned by an agent,
+  populate the Agent column.
 - **Coordinator skills** — pick or chain producers (skill-orchestrator,
   project-onboarding).
 - **Meta-skills** — run alongside (cognitive-alignment, memory-ontology,
-  compact-ritual) and are nearly always present.
+  compact-ritual) and are nearly always present. Always `Agent: –`
+  (cross-cutting).
 
 The meta-skills row is mandatory in every scenario checklist — they are
 not optional, even when the scenario doesn't explicitly mention them.
