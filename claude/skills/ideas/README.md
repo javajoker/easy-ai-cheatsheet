@@ -1,12 +1,15 @@
 # Project Skillset
 
-An eleven-skill toolkit covering the entire project lifecycle — from fuzzy
-idea to production-ready codebase to onboarded existing project.
+A twelve-skill toolkit covering the entire project lifecycle — from fuzzy
+idea to production-ready codebase to onboarded existing project to
+incremental feature delivery.
 
 **Eight skills** form the linear "idea → built code" quick-start workflow.
 **Three skills** handle the orthogonal tasks of onboarding an existing
 project, producing the per-project INSTRUCTIONS files, and building a
 conceptual knowledge base.
+**One skill** (`feature-spec`) produces a single-feature delta spec for an
+already-onboarded project — the incremental counterpart to `project-docs`.
 
 This skillset replaces ad-hoc prompting with structured, composable skills that:
 1. Each have a clear job and a clear handoff to the next.
@@ -39,11 +42,14 @@ This skillset replaces ad-hoc prompting with structured, composable skills that:
 | `project-onboarding` | Bringing an existing codebase into the framework for the first time, or refreshing a long-inactive project. Reads the codebase, gathers facts, delegates artifact-writing to `create-project-instruction`, seeds memory. |
 | `create-project-instruction` | Producing the per-project INSTRUCTIONS files from any input — an existing codebase, a fresh-project conversation, a PRD + tech design, or a hybrid. Called by `project-onboarding` (Mode A), can be called after `project-docs` (Mode C), or run standalone. |
 | `project-knowledge-base` | Building a conceptual knowledge graph of an existing project (features, modules, abstractions, decisions, terminology). Output is a navigable docs/knowledge-base/ tree. |
+| `feature-spec` | Producing a single-feature delta spec for an already-onboarded project — the incremental counterpart to `project-docs`. Writes `docs/features/FEATURE_<slug>.md` covering 11 sections (why, out-of-scope, load-bearing terms, contract deltas, verification, rollout, risks). Consumed by the `feature-development` agent. |
 
-These three are *orthogonal* to the eight-skill linear workflow. You can run
+These four are *orthogonal* to the eight-skill linear workflow. You can run
 them at any time before, after, or independently of the linear chain.
 `create-project-instruction` is also the producer that `project-onboarding`
-calls during its Phase 4.
+calls during its Phase 4. `feature-spec` typically runs under the
+`feature-development` agent against a project that has already been
+onboarded.
 
 ---
 
@@ -302,4 +308,5 @@ Each skill has sensible defaults but accepts user overrides:
 - `skills/project-backend-node/SKILL.md` — Node.js backend
 - `skills/project-backend-go/SKILL.md` — Go backend
 - `skills/project-backend-python/SKILL.md` — Python backend
+- `skills/feature-spec/SKILL.md` + `references/` — single-feature delta spec for onboarded projects
 - `WORKFLOW.md` — detailed phase-by-phase walkthrough

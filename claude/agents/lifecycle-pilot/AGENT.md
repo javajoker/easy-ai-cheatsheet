@@ -24,13 +24,13 @@ skills_used:
     - skill-orchestrator
     - cognitive-alignment
     - memory-ontology
-  proposed:
     - gtm-launch-readiness
     - gtm-positioning
     - gtm-pricing-model
     - gtm-marketing-site
     - gtm-beta-program
     - gtm-analytics-instrumentation
+  proposed: []
 deliverables:
   - phase-1: prototype (React artifact) — owned by project-prototype
   - phase-2: PRD.md + UIUX_SPEC.md + TECH_DESIGN.md — owned by project-docs

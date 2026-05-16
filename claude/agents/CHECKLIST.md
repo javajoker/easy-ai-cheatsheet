@@ -79,6 +79,16 @@ named gap with no skill folder yet).
   - [x] `enterprise-kb-access-control` — 5-level classification (public / internal / restricted / confidential / regulated); internal as restrictive default; per-classification redaction policy; full audit log with anomaly alerts; quarterly access audits — **shipped**
 - [ ] Scenario in `SCENARIOS.md` — *missing* (next pass)
 
+### 6. feature-development — Add a feature to an onboarded project
+
+- [x] `agents/feature-development/AGENT.md` — **shipped**
+- [x] Existing skills wired in: `cognitive-alignment`, `project-knowledge-base`, `memory-ontology`, `requirement-audit`, `compact-ritual`, `skill-orchestrator`, language `*-code-review`/`*-testing`/`*-linting`, `doc-markdown-standards`
+- [x] **New skill — fleshed out:**
+  - [x] `feature-spec` — single-feature delta spec; 11-section structure (why, out-of-scope, load-bearing terms, user-facing change, API contract delta, data model delta, background work delta, verification plan, rollout plan, risks + open questions, related artifacts); writes `docs/features/FEATURE_<slug>.md` into the project (not `/mnt/user-data/outputs/`); pairs with `requirement-audit` for the verification rubric — **shipped** (+ `references/feature-spec-template.md`, `references/api-delta-template.yaml`, `references/verification-rubric.md`)
+- [x] Reference files for the agent — **shipped** (`feature-development-checklist.md`, `handoff-decision-tree.md`, `feature-pr-template.md`)
+- [x] Scenario T in `SCENARIOS.md` — **shipped**
+- [x] HOWTO-EXAMPLES.md walkthrough — **shipped** (Example 2)
+
 ---
 
 ## Cross-cutting work
@@ -139,16 +149,18 @@ updated recommended order. Each line is a self-contained next prompt.
 
 | Group | Total | Shipped | Stub | Missing |
 |---|---|---|---|---|
-| Agents | 5 | 5 (scaffold) | 0 | 0 |
+| Agents | 6 | 6 | 0 | 0 |
 | New skills (lifecycle-pilot / GTM) | 6 | **6** | 0 | 0 |
 | New skills (architecture-shepherd) | 5 | **5** | 0 | 0 |
 | New skills (scenario-strategist) | 4 | **4** | 0 | 0 |
 | New skills (devops-engineer) | 7 | **7** | 0 | 0 |
 | New skills (knowledge-curator) | 5 | **5** | 0 | 0 |
-| **New skills total** | **27** | **27** | **0** | **0** |
-| Scenarios | 7 (5 single-agent + 2 multi-agent) | **7** | 0 | 0 |
+| New skills (feature-development) | 1 | **1** | 0 | 0 |
+| **New skills total** | **28** | **28** | **0** | **0** |
+| Scenarios | 8 (6 single-agent + 2 multi-agent) | **8** | 0 | 0 |
 | Orchestrator agent-preference hooks | 1 | **1** | 0 | 0 |
 | HOWTO.md agents layer | 1 | **1** | 0 | 0 |
+| HOWTO-EXAMPLES.md worked examples | 1 | **1** | 0 | 0 |
 | Polish (`scenario-checklist` column, orchestrator references) | 2 | **2** | 0 | 0 |
 
-Updated: 2026-05-15 (pass 9 — **build complete**; every line of the checklist is now shipped or done)
+Updated: 2026-05-16 (pass 11 — **feature-development agent + feature-spec skill + HOWTO-EXAMPLES shipped**; build remains complete with one additional agent and one additional skill since pass 10).

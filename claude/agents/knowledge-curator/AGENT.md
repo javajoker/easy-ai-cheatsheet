@@ -24,12 +24,12 @@ skills_used:
     - cognitive-alignment      # KB terminology must be aligned across projects
     - requirement-audit
     - compact-ritual
-  proposed:
     - enterprise-kb-architecture
     - enterprise-kb-merge
     - enterprise-kb-refresh-policy
     - enterprise-kb-search-index
     - enterprise-kb-access-control
+  proposed: []
 deliverables:
   - enterprise-kb/INDEX.md          # top-level index across all sources
   - enterprise-kb/entities/         # canonical entities (merged from per-project KBs + books)

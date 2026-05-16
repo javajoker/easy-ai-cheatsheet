@@ -1,0 +1,109 @@
+# OpenAPI fragment template for a feature's API delta.
+# Drop this in docs/features/<slug>/api-delta.yaml when the feature
+# touches more than one or two endpoints, or when the request/response
+# schemas are non-trivial.
+#
+# This is a fragment, not a full spec — it is meant to be merged into
+# the project's master OpenAPI document (typically docs/openapi.yaml)
+# at implementation time.
+
+openapi: 3.1.0
+info:
+  title: Feature delta — <feature-slug>
+  version: 0.1.0
+  description: |
+    API surface added or changed by feature <slug>. Merge into
+    docs/openapi.yaml when implementation lands.
+
+paths:
+
+  /<resource>:
+    post:
+      summary: <one-line>
+      operationId: <camelCaseOperationId>
+      tags: [<feature-slug>]
+      security:
+        - bearerAuth: [<required-scope>]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/<RequestSchema>'
+            examples:
+              minimal:
+                value: { ... }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/<ResponseSchema>'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Conflict — <when this happens>
+
+  /<resource>/{id}:
+    get:
+      summary: <one-line>
+      operationId: <camelCaseOperationId>
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/<ResponseSchema>'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+
+  schemas:
+
+    <RequestSchema>:
+      type: object
+      required: [<required-field-list>]
+      properties:
+        <field>:
+          type: string
+          description: <one-line>
+      additionalProperties: false
+
+    <ResponseSchema>:
+      type: object
+      required: [id, <other-required-fields>]
+      properties:
+        id:
+          type: string
+          format: uuid
+        <field>:
+          type: string
+
+  # Reuse the project's existing responses where possible.
+  responses:
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Unauthorized:
+      description: Missing or invalid credentials
+    NotFound:
+      description: Resource not found
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

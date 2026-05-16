@@ -18,11 +18,11 @@ skills_used:
     - cognitive-alignment     # locks the meaning of scenario terms before designing
     - memory-ontology         # persists the chosen workflow as a reusable scenario
     - compact-ritual
-  proposed:
     - scenario-analysis            # multi-option trade-off with weighted criteria
     - workflow-design              # phase-by-phase workflow from a scenario brief
     - agent-group-formation        # picks the right N agents and assigns roles
     - agent-handoff-protocol       # defines artifacts + acceptance criteria between agents
+  proposed: []
 deliverables:
   - scenario-brief.md          # locked anchor of the scenario (goal, scope, constraints, success criteria)
   - options-analysis.md        # 2–4 candidate approaches with weighted trade-offs

@@ -31,7 +31,7 @@ An agent definition answers five questions:
 5. **Deliverables and verification.** What outputs prove the job is done,
    and how do we audit them?
 
-## The five shipped agents
+## The six shipped agents
 
 | Agent | Focus area | One-line job |
 |---|---|---|
@@ -40,6 +40,7 @@ An agent definition answers five questions:
 | [`scenario-strategist`](scenario-strategist/AGENT.md) | Scenario analysis, workflow design, agent-group formation | Analyse a fuzzy scenario, design the workflow, form the right *group* of agents to execute, hand off. |
 | [`devops-engineer`](devops-engineer/AGENT.md) | DevOps | CI/CD, infra-as-code, observability, incident runbooks, release management, secrets. |
 | [`knowledge-curator`](knowledge-curator/AGENT.md) | Enterprise knowledge base upgrade | Build, merge, refresh, and govern a multi-project enterprise knowledge base with search and access control. |
+| [`feature-development`](feature-development/AGENT.md) | Add a feature to an onboarded project | Own the incremental-feature arc: spec → contract lock → code → verify → ship; cleanly hands off to architecture / devops / KB when needed. |
 
 See [CHECKLIST.md](CHECKLIST.md) for current build status of each agent and
 its dependent skills.
@@ -90,7 +91,7 @@ The `AGENT.md` frontmatter follows this shape:
 ---
 name: <kebab-case-name>
 role: <one-line persona>
-focus_area: <one of: lifecycle | architecture | scenario | devops | knowledge>
+focus_area: <one of: lifecycle | architecture | scenario | devops | knowledge | feature>
 status: shipped | stub | draft
 fires_on:
   - <trigger phrase or scenario>

@@ -20,12 +20,12 @@ skills_used:
     - cognitive-alignment      # lock the meaning of "service", "queue", "tenant" etc.
     - compact-ritual           # long migrations span multiple sessions
     - go-code-review / node-code-review / py-code-review / java-code-review
-  proposed:
     - arch-assessment
     - arch-migration-plan
     - arch-dependency-upgrade
     - arch-rollout-strategy
     - arch-breaking-change-comms
+  proposed: []
 deliverables:
   - architecture-assessment.md  # current-state snapshot, risk register, options matrix
   - migration-plan.md           # phased plan with reversible checkpoints

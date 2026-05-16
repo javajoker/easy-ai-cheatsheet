@@ -21,7 +21,6 @@ skills_used:
     - compact-ritual          # long ops projects span sessions
     - doc-markdown-standards  # runbooks and ops docs follow doc conventions
     - go-code-review / node-code-review / py-code-review / java-code-review
-  proposed:
     - devops-ci-cd
     - devops-iac
     - devops-observability
@@ -29,6 +28,7 @@ skills_used:
     - devops-release-management
     - devops-security-hardening
     - devops-secrets
+  proposed: []
 deliverables:
   - .github/workflows/ (or .gitlab-ci.yml / Jenkinsfile) — CI/CD pipeline
   - infrastructure/ — Terraform / Pulumi / CDK scaffolds

@@ -96,7 +96,7 @@ If you go an entire session without any of these firing, something is wrong.
 
 Agents sit on top of skills. They are named roles that bundle a
 workflow + skills + deliverables for a specific job. The framework
-ships five:
+ships six:
 
 | Agent | Job |
 |---|---|
@@ -105,6 +105,7 @@ ships five:
 | [`devops-engineer`](agents/devops-engineer/AGENT.md) | CI/CD, IaC, observability, runbooks, releases, security, secrets |
 | [`architecture-shepherd`](agents/architecture-shepherd/AGENT.md) | Architecture upgrade end-to-end (assess → migrate → roll out → communicate) |
 | [`knowledge-curator`](agents/knowledge-curator/AGENT.md) | Enterprise knowledge base (architecture → merge → refresh → search → ACL) |
+| [`feature-development`](agents/feature-development/AGENT.md) | Add a feature to an onboarded project (spec → contract lock → code → verify → ship) |
 
 ### When the orchestrator picks an agent vs a skill chain
 
@@ -403,8 +404,11 @@ collision.
 
 ## See also
 
+- [HOWTO-EXAMPLES.md](HOWTO-EXAMPLES.md) — two worked end-to-end
+  examples: onboarding an existing project, and adding a feature to
+  an onboarded project.
 - [SCENARIOS.md](SCENARIOS.md) — step-by-step playbooks. Scenarios A–L
-  are skill-level; **M–S are agent-level** (one per agent + two
+  are skill-level; **M–T are agent-level** (one per agent + two
   multi-agent compositions).
 - [agents/README.md](agents/README.md) — the role layer.
 - [agents/CHECKLIST.md](agents/CHECKLIST.md) — agent + new-skill build

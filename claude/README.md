@@ -9,7 +9,7 @@ many projects. It combines three layers:
   their triggers fire.
 - **`agents/`** — named roles that bundle a workflow, a set of skills, and a
   deliverable contract for a specific job (lifecycle, architecture upgrade,
-  scenario strategy, devops, enterprise knowledge base).
+  scenario strategy, devops, enterprise knowledge base, feature development).
 
 The framework is **English-first** so the model can maintain it uniformly.
 Project output (code, docs, user-facing copy, conversational restate phrases)
@@ -39,7 +39,8 @@ claude/
 │   ├── architecture-shepherd/      # architecture upgrade support
 │   ├── scenario-strategist/        # scenario analysis + workflow + group formation
 │   ├── devops-engineer/            # CI/CD, IaC, observability, runbooks, secrets
-│   └── knowledge-curator/          # enterprise knowledge base upgrade
+│   ├── knowledge-curator/          # enterprise knowledge base upgrade
+│   └── feature-development/        # add a feature to an onboarded project
 └── skills/
     ├── share/                      # cross-cutting meta-skills
     │   ├── skill-orchestrator/     # picks and chains skills for multi-step tasks
@@ -50,7 +51,7 @@ claude/
     │   ├── scenario-checklist/     # produces the "Skills involved" table for a workflow
     │   ├── skill-evolution/        # captures live-use evolution candidates as proposals
     │   └── skill-merge/            # applies accepted proposals with conflict detection
-    ├── ideas/                      # project lifecycle (11 skills)
+    ├── ideas/                      # project lifecycle (12 skills)
     │   ├── README.md               # the project quick-start narrative
     │   ├── WORKFLOW.md             # detailed phase-by-phase walkthrough
     │   ├── project-prototype/
@@ -63,7 +64,8 @@ claude/
     │   ├── project-backend-python/
     │   ├── project-onboarding/     # bring an existing codebase into the framework
     │   ├── project-knowledge-base/ # conceptual knowledge graph of a project
-    │   └── create-project-instruction/  # focused producer for INSTRUCTIONS/projects/<slug>/
+    │   ├── create-project-instruction/  # focused producer for INSTRUCTIONS/projects/<slug>/
+    │   └── feature-spec/           # single-feature delta spec for an onboarded project
     ├── dev-go/                     # 20 Go style and quality skills (portable)
     ├── dev-node/                   # 20 Node.js / TypeScript skills (portable)
     ├── dev-python/                 # 20 Python style and quality skills (portable)
@@ -84,7 +86,7 @@ claude/
 | Group | Skills |
 |---|---|
 | `share/` | 8 |
-| `ideas/` | 11 |
+| `ideas/` | 12 |
 | `dev-go/` | 20 |
 | `dev-node/` | 20 |
 | `dev-python/` | 20 |
@@ -98,11 +100,11 @@ claude/
 | `devops/` | 7 |
 | `enterprise-kb/` | 5 |
 | `projects/` | 1 |
-| **Total** | **137** (all shipped) |
+| **Total** | **138** (all shipped) |
 
 | Agents | Count |
 |---|---|
-| `agents/` (scaffold) | 5 |
+| `agents/` (scaffold) | 6 |
 
 Plus 13 portable instruction files under `INSTRUCTIONS/` and 2 templates.
 The top-level `REQUIREMENTS-AUDIT.md` records the verified completion of
@@ -123,6 +125,9 @@ the framework-consolidation request that produced this revision.
 ## Quick links
 
 - **First time using this?** See [HOWTO.md](HOWTO.md).
+- **Want two worked end-to-end examples?** See
+  [HOWTO-EXAMPLES.md](HOWTO-EXAMPLES.md) — onboarding an existing
+  project, and adding a feature to one.
 - **Want a step-by-step playbook for a common situation?** See
   [SCENARIOS.md](SCENARIOS.md).
 - **Which agents own which jobs?** See [agents/README.md](agents/README.md).
