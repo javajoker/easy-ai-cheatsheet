@@ -155,7 +155,10 @@ If a phase's owner role doesn't fit any shipped agent:
   this phase has weaker contract verification.
 - **New-agent recommendation.** Suggest a new agent (kebab-case
   name + one-line role) and add it to `claude/agents/CHECKLIST.md`
-  under "Missing roles surfaced by group formation".
+  under "Missing roles surfaced by group formation". To actually
+  build it, hand the role to `agent-create`, which qualifies it
+  against the "job, not a task" bar, drafts the AGENT.md, and
+  registers it.
 
 Do not silently route the phase to an ill-fitting agent. The gap
 must be visible.
@@ -201,6 +204,8 @@ Re-run if:
 
 - `workflow-design` — upstream input.
 - `agent-handoff-protocol` — downstream consumer.
+- `agent-create` — builds a new agent for a missing-role recommendation
+  (Phase 5).
 - `scenario-checklist` — same row format at skill granularity.
 - `cognitive-alignment` — if role-language is ambiguous, lock it
   before staffing.

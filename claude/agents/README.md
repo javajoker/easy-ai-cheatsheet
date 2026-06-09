@@ -106,6 +106,14 @@ companion_agents: [list]
 
 ## Adding a new agent
 
+> The `agent-create` skill (`skills/share/agent-create/`) mechanizes the six
+> steps below — it qualifies the role against the "job, not a task" bar,
+> drafts the AGENT.md from the frontmatter contract, and applies the
+> registration (CHECKLIST + README + SCENARIOS/orchestrator follow-ups) with
+> a human checkpoint. Run it instead of doing these by hand; the steps remain
+> here as the contract it follows. `agent-version-tune` and
+> `agent-group-formation` both route here when they surface a new-role need.
+
 1. Identify a recurring chain of skills that handles a coherent *job*
    (not a single task — that's a skill).
 2. Run `scenario-strategist` to formalise the workflow and skill list.

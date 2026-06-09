@@ -50,7 +50,15 @@ claude/
     │   ├── requirement-audit/      # PASS/PARTIAL/FAIL checklist of a multi-point ask
     │   ├── scenario-checklist/     # produces the "Skills involved" table for a workflow
     │   ├── skill-evolution/        # captures live-use evolution candidates as proposals
-    │   └── skill-merge/            # applies accepted proposals with conflict detection
+    │   ├── skill-merge/            # applies accepted proposals with conflict detection
+    │   ├── skill-version-tune/     # retunes a skill for a model/harness version (dispatcher)
+    │   ├── agent-version-tune/     # retunes an agent (AGENT.md) for a version (dispatcher)
+    │   ├── instructions-version-tune/  # retunes an INSTRUCTIONS file for a version (dispatcher)
+    │   ├── agent-create/           # scaffolds + registers a new agent
+    │   ├── tune-for-opus-4-6/      # Opus 4.6 capability lens (shared worker)
+    │   ├── tune-for-opus-4-7/      # Opus 4.7 capability lens (shared worker)
+    │   ├── tune-for-opus-4-8/      # Opus 4.8 capability lens (shared worker)
+    │   └── tune-for-cc-harness/    # current CC harness capability lens (shared worker)
     ├── ideas/                      # project lifecycle (12 skills)
     │   ├── README.md               # the project quick-start narrative
     │   ├── WORKFLOW.md             # detailed phase-by-phase walkthrough
@@ -85,7 +93,7 @@ claude/
 
 | Group | Skills |
 |---|---|
-| `share/` | 8 |
+| `share/` | 16 |
 | `ideas/` | 12 |
 | `dev-go/` | 20 |
 | `dev-node/` | 20 |
@@ -100,7 +108,7 @@ claude/
 | `devops/` | 7 |
 | `enterprise-kb/` | 5 |
 | `projects/` | 1 |
-| **Total** | **138** (all shipped) |
+| **Total** | **146** (all shipped) |
 
 | Agents | Count |
 |---|---|
@@ -175,6 +183,20 @@ full audit summary. Key changes:
   and downstream consistency checks). Together they form the observe →
   propose → merge loop so the framework can sharpen itself through use
   without silent file rewrites.
+- A version-tuning skill family under `share/` that retunes any framework
+  layer to make full benefit of a named Claude model or Claude Code harness
+  version. Three layer dispatchers share four per-version capability workers:
+  `skill-version-tune` (skills), `agent-version-tune` (agents, AGENT.md), and
+  `instructions-version-tune` (always-loaded INSTRUCTIONS) all load the same
+  provenance-tagged capability sheets — `tune-for-opus-4-6`, `tune-for-opus-4-7`,
+  `tune-for-opus-4-8`, `tune-for-cc-harness` (`(confirmed)` vs `(inferred)`).
+  Each dispatcher applies its own layer lens and emits `skill-evolution`
+  proposals (reusing the merge loop — no silent rewrites), stamping an additive
+  `tuned-for:` field on what it tunes. The agent dispatcher branches to
+  `agent-create` — a new skill that scaffolds and registers a brand-new agent
+  (AGENT.md + CHECKLIST + README) — when a version makes a whole new role
+  viable; `agent-create` is also the destination for `agent-group-formation`'s
+  "create new agent" recommendation.
 - All cross-cutting workflows documented in `SCENARIOS.md` with checklists,
   including Scenario K (framework self-audit) and Scenario L (evolving a
   skill through live project use).
