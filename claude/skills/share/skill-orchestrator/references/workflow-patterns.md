@@ -152,6 +152,17 @@ When the user is building, improving, or testing a skill itself.
 
 This is usually a single-skill task — `skill-creator` is the entire workflow. No orchestration needed unless the new skill being created is itself an orchestrator (in which case, this very file might be a useful reference).
 
+### Create a new agent
+
+**User signal:** "Create an agent for X", "we keep chaining the same skills — make it an agent", "scaffold an agent that owns the <job> arc"
+**Chain:** `agent-create` (qualifies the role → drafts AGENT.md → registers in CHECKLIST + README → flags SCENARIOS/orchestrator follow-ups)
+**Inputs needed upfront:**
+- The job's deliverable contract (what artifacts prove it's done)?
+- The phase workflow + which skills each phase uses (run `scenario-strategist` first if not yet formalised)?
+- Single owner per deliverable confirmed?
+
+Also the destination when `agent-group-formation` recommends "create a new agent" for an unstaffed role, or when `agent-version-tune` finds a version makes a new role viable. Gate: it must be a *job* (multi-skill, multi-phase, owns a contract), not one skill in a trench coat.
+
 ### Improve an existing skill
 
 **User signal:** "Make my X skill better", "Optimize this skill's triggering"
@@ -159,6 +170,21 @@ This is usually a single-skill task — `skill-creator` is the entire workflow. 
 **Inputs needed upfront:**
 - Path to the existing skill, or upload?
 - What's wrong (specific failure mode) or just general polish?
+
+### Tune a skill / agent / instructions for a model / harness version
+
+**User signal:** "Tune this skill for Opus 4.8", "modernise the devops-engineer agent for the new harness", "update the best-practices instructions for subagents/plan mode", "make it exploit the new model"
+**Chain (pick the layer dispatcher):**
+- skill → `skill-version-tune`
+- agent (AGENT.md) → `agent-version-tune` (branches to `agent-create` if a new role is warranted)
+- INSTRUCTIONS file → `instructions-version-tune`
+
+…then the shared per-version worker (`tune-for-opus-4-6` / `-4-7` / `-4-8` / `tune-for-cc-harness`) → `skill-evolution` proposals → `skill-merge`.
+**Inputs needed upfront:**
+- Which artifact to retune (path), and which layer (skill / agent / INSTRUCTIONS)?
+- Toward which version — a specific Opus (4.6/4.7/4.8), the current harness, or both? (If "the latest", confirm the running model.)
+
+Distinct from "improve an existing skill": that polishes against a failure mode; this exploits *new model/harness capability*. All three dispatchers share the same provenance-tagged capability workers, emit proposals (no silent rewrite), and stamp a `tuned-for:` field on merge. Tune the layer that's actually behind — an agent gap is often really a gap in a skill it composes.
 
 ---
 
