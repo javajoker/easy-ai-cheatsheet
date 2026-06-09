@@ -253,15 +253,32 @@ follow the chain documented in `skills/ideas/WORKFLOW.md`.
 ## Per-project skills
 
 Some projects acquire an internal API surface or convention set large enough
-to deserve a dedicated skill. Those skills live under `skills/projects/`,
-keyed by project slug. The example currently in the tree is
-`skills/projects/stardust-rtl/` — a runtime-reference skill for code that
-uses the `stardust` Go microservice library.
+to deserve a dedicated skill. Those skills live under `skills/projects/<slug>/`,
+keyed by project slug — a namespace created on demand (none ship with the
+framework, so the portable surface stays clean).
 
-Project-specific skills can keep their `references/` content in the
-project's primary language (the SKILL.md wrapper is still English so that
-description-based triggering works). See `skills/projects/README.md` for the
-naming convention and the rule on when to create one.
+Create one when, and only when:
+
+- The project has a substantial internal API surface (more than a couple of
+  packages) that downstream code repeatedly looks up.
+- Its conventions deviate enough from the portable defaults that the generic
+  dev skills would produce wrong output (e.g. a custom error-wrapping helper
+  instead of the stdlib one).
+- It has operational quirks (release or deploy procedure) worth a dedicated
+  runbook skill.
+
+Do *not* create one when the project follows the framework defaults, or when
+the "specifics" are a handful of style preferences — capture those in
+`INSTRUCTIONS/projects/<slug>/conventions.md` instead.
+
+Naming: the SKILL.md `name:` reuses the project slug with a suffix describing
+the reference kind — `-rtl` (runtime library / internal API), `-conventions`
+(style or layout rules), `-runbook` (operational procedures). The SKILL.md
+wrapper stays English so description-based triggering works in mixed-language
+environments; the `references/` content may be in the project's primary
+language. Each project-specific skill typically pairs with an
+`INSTRUCTIONS/projects/<slug>/` directory; `project-onboarding` produces both
+sides of that pairing.
 
 ## Adding your own skill
 
@@ -477,13 +494,11 @@ collision.
 
 ## See also
 
-- [HOWTO-EXAMPLES.md](HOWTO-EXAMPLES.md) — two worked end-to-end
-  examples: onboarding an existing project, and adding a feature to
-  an onboarded project.
 - [SCENARIOS.md](SCENARIOS.md) — step-by-step playbooks. Scenarios A–L
   are skill-level; **M–T are agent-level** (one per agent + two
   multi-agent compositions); **U** is framework-maintenance (tuning to a
-  model/harness update).
+  model/harness update). The appendix adds two fully worked end-to-end
+  examples: onboarding a project, and adding a feature.
 - [agents/README.md](agents/README.md) — the role layer.
 - [agents/CHECKLIST.md](agents/CHECKLIST.md) — agent + new-skill build
   status.

@@ -30,9 +30,8 @@ INSTRUCTIONS/
 │   ├── project-context.md
 │   └── repository-structure.md
 └── projects/                       # filled-in instances for specific projects
-    ├── README.md
-    ├── stardust/                   # example: a Go base library
-    └── coolshell/                  # example: an AI-pattern customization platform
+    ├── README.md                   # convention + how to add a project
+    └── <project-slug>/             # one dir per onboarded project (created on demand)
 ```
 
 ## How Claude uses this

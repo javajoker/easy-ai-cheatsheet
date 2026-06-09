@@ -4,8 +4,10 @@ Step-by-step playbooks for common situations, each with a checklist of the
 skills involved. If a skill is **marked missing**, the framework does not yet
 ship one and you'll want to fall back to a manual procedure.
 
-For the everyday mechanics, see [HOWTO.md](HOWTO.md). For the underlying
-audit and design rationale, see the [appendix at the end](#appendix-checklists).
+For the everyday mechanics, see [HOWTO.md](HOWTO.md). For the per-group skill
+inventory and known gaps, see [Appendix — Checklists](#appendix--checklists).
+For two fully worked end-to-end walkthroughs, see
+[Appendix B — Worked examples](#appendix-b--worked-examples).
 
 ---
 
@@ -54,6 +56,9 @@ If you have the facts gathered but want help just writing the files, invoke
 `create-project-instruction` standalone in Mode A — it will read the inputs
 you provide and produce the same artifacts as the onboarding pass without
 the surrounding scan + memory-seed phases.
+
+A fully worked version of this scenario lives in
+[Appendix B — Example 1](#example-1--generating-project-skills--instructions-from-an-existing-project).
 
 ---
 
@@ -1066,7 +1071,7 @@ Gaps: 0. Recommended next step: invoke the agent —
 project."*
 
 A fully worked version of this scenario lives in
-[HOWTO-EXAMPLES.md Example 2](HOWTO-EXAMPLES.md#example-2--adding-a-new-feature-end-to-end)
+[Appendix B — Example 2](#example-2--adding-a-feature-end-to-end)
 (adding discount codes to a fictional e-commerce project).
 
 ---
@@ -1224,11 +1229,8 @@ Aggregated quick-reference of which skills exist (✓), which are project-specif
 ### `dev-go/` — Go quality skills
 
 20 portable skills covering style, naming, errors, concurrency, testing,
-etc. All shipped (✓).
-
-The previous `go-stardust-rtl` was moved out of this group into
-`skills/projects/stardust-rtl/` because it is project-specific rather than
-generic Go guidance.
+etc. All shipped (✓). Project-specific Go guidance does not belong here —
+it goes under `skills/projects/<slug>/` (see below).
 
 ### `dev-node/` — Node.js / TypeScript quality skills
 
@@ -1253,12 +1255,11 @@ performance, documentation, linting, and code-review. All shipped (✓).
 
 ### `projects/` — project-specific skills
 
-| Skill | Status |
-|---|---|
-| `stardust-rtl` | ✓ (◐ project-specific: stardust; example of skill produced via project-onboarding) |
-
-Add additional entries here when a project earns one (see
-`skills/projects/README.md` for when to create one).
+None ship with the framework. `skills/projects/<slug>/` is a namespace
+created on demand when a project earns a dedicated skill (substantial
+internal API surface, conventions that break the generic dev skills, or
+operational quirks worth a runbook). See HOWTO.md "Per-project skills" for
+the naming convention and the when-to-create rule.
 
 ### `dev-tools/`
 
@@ -1292,9 +1293,9 @@ as the template and update the relevant scenarios above.
 
 ## Agents — quick reference
 
-The framework ships **five agents** under `agents/`. Each agent is a
+The framework ships **six agents** under `agents/`. Each agent is a
 named role bundling a workflow + skills + deliverables for a specific
-job. The scenarios above (M–S) document the characteristic arc per
+job. The scenarios above (M–T) document the characteristic arc per
 agent and the common multi-agent compositions.
 
 | Agent | Focus | Single-agent scenario | Multi-agent appearances |
@@ -1304,10 +1305,153 @@ agent and the common multi-agent compositions.
 | [`devops-engineer`](agents/devops-engineer/AGENT.md) | CI/CD, IaC, observability, runbooks, releases, security, secrets | [O](#scenario-o--operational-baseline--ongoing-ops-devops-engineer) | M, P, R, S |
 | [`architecture-shepherd`](agents/architecture-shepherd/AGENT.md) | Architecture upgrade support | [P](#scenario-p--architecture-upgrade-architecture-shepherd) | R |
 | [`knowledge-curator`](agents/knowledge-curator/AGENT.md) | Enterprise knowledge base upgrade | [Q](#scenario-q--enterprise-knowledge-base-knowledge-curator) | S |
+| [`feature-development`](agents/feature-development/AGENT.md) | Add a feature to an onboarded project | [T](#scenario-t--adding-a-feature-to-an-onboarded-project-feature-development) | — |
 
 See [agents/README.md](agents/README.md) for the agents layer rationale
 and [agents/CHECKLIST.md](agents/CHECKLIST.md) for build status of every
 agent + its dependent skills.
+
+---
+
+## Appendix B — Worked examples
+
+Two end-to-end walkthroughs showing how the four layers (instruction →
+agent → skill → reference) run in practice. Both use a fictional project —
+**`acme-shop`**, an e-commerce app with a React frontend, a Go backend, and
+the usual operational stack — to keep the chain concrete. The scenarios
+above are the playbooks; this is the worked tour with real prompts and
+intermediate artifacts.
+
+### Example 1 — Generating project skills + instructions from an existing project
+
+**Goal.** Take an existing repository and produce the framework artifacts
+that let future Claude Code sessions start fully oriented:
+`INSTRUCTIONS/projects/acme-shop/` (portable context + repo structure),
+`docs/knowledge-base/` (conceptual map), and — only if the project warrants
+one — `skills/projects/acme-shop/` (the project's internal API surface and
+conventions).
+
+**Layer involvement.** No agent directly — this is the skill-level chain
+that produces the inputs an agent later needs. (Scenario A is the playbook.)
+**Skills:** `project-onboarding` → `create-project-instruction` →
+`project-knowledge-base` → (optional) a hand-authored project skill.
+
+**Step 1 — Onboard.** In the repo, say *"Onboard this project."*
+`project-onboarding` reads the codebase (no edits), identifies the stack,
+conventions, and test/lint/build commands, then asks 3–7 targeted questions
+for what it cannot infer (e.g. *"docker-compose is present but the README
+doesn't mention it — is that the canonical local-dev workflow?"*). You
+confirm or correct; it delegates to `create-project-instruction` (Mode A),
+which writes `INSTRUCTIONS/projects/acme-shop/project-context.md` and
+`repository-structure.md`. These join the **instruction layer** — loaded
+automatically next time anyone opens Claude Code in this repo. A baseline of
+memory entries (name, stack, owners, commands) lands here too.
+
+**Step 2 — Knowledge base.** Say *"Build a knowledge base for this
+project."* `project-knowledge-base` produces a navigable
+`docs/knowledge-base/` tree (`INDEX.md`, one `entities/<name>.md` per
+concept — product, order, cart, checkout, customer, discount, webhook — a
+`relations.md`, a `terminology.md`, and captured `decisions/`). This is the
+**reference layer** for project-specific knowledge.
+
+**Step 3 — Decide on a project-specific skill.** Create one only if the
+project clears the bar (substantial internal API surface; conventions that
+break the generic dev skills; operational quirks worth a runbook). For
+`acme-shop` — several reused packages plus a custom `errx.Wrap` error helper
+— it qualifies, so the session hand-authors `skills/projects/acme-shop/`
+(English SKILL.md + `references/` covering error handling, service layout,
+webhook verification, i18n). See HOWTO.md "Per-project skills" for the
+convention. This step is typically hand-authored, not auto-generated.
+
+**Step 4 — Register + verify.** Add `acme-shop` under
+`INSTRUCTIONS/projects/` so other agents discover it, then run
+*"requirement-audit the onboarding."* The audit returns a PASS/PARTIAL/FAIL
+table over the deliverable list (context file, repo-structure file, KB tree,
+seeded memory, registration, project skill if warranted).
+
+**What you produced.** Instruction layer (`INSTRUCTIONS/projects/acme-shop/`),
+optional skill layer (`skills/projects/acme-shop/`), reference layer (the
+docs both load on demand), knowledge graph (`docs/knowledge-base/`), and
+baseline memory. The project is now ready for any agent to engage.
+
+### Example 2 — Adding a feature end-to-end
+
+**Goal.** Add a working **discount-code** feature to `acme-shop` — spec it,
+build the API + DB + frontend, wire metrics + alerts, ship behind a flag,
+verify, hand off clean.
+
+**Agent.** [`feature-development`](agents/feature-development/AGENT.md) owns
+the five-phase arc. **Skills:** `feature-spec` + language dev/testing/lint/
+review skills (`go-*` backend, `node-*` frontend) + `requirement-audit` +
+`cognitive-alignment` + `memory-ontology`. Optionally hands slices to
+`devops-engineer` (metrics + alerts) and `knowledge-curator` (if a published
+KB entity changes).
+
+**Phase 1 — Anchor + align.** *"Add discount codes to acme-shop. Single-use
+codes, percentage or fixed amount, optional minimum cart subtotal, optional
+product restriction."* The agent loads
+`INSTRUCTIONS/projects/acme-shop/*` (from Example 1) and the relevant KB
+entities, notes no `discount.md` exists yet, loads the project skill's
+error-handling reference (so it uses `errx.Wrap`, not `fmt.Errorf`), and
+runs `cognitive-alignment` to lock the load-bearing terms (discount code,
+single-use, percentage vs fixed, eligibility). It asks up to three setup
+questions (environment path, risk posture / flag, single owner).
+
+**Phase 2 — Spec.** `feature-spec` writes
+`docs/features/FEATURE_discount-codes.md` from its template — the 11 sections
+(Why, Out of scope, Load-bearing terms, User-facing change, **API contract
+delta** with new `POST /apply-discount` + `DELETE /discount` + additive
+checkout-envelope change, **Data model delta** with a `discount_codes` table
+whose `UNIQUE(code) WHERE used_at IS NULL` index enforces single-use,
+Background work, **Verification plan**, **Rollout plan**, Risks/open
+questions, Related artifacts). `requirement-audit` against the spec's
+verification rubric gates `draft` → `approved`.
+
+**Phase 3 — Contract lock + planning.** API + DB contracts commit; the agent
+produces the implementation task list (migration → endpoints → checkout
+envelope → flag wiring → UI + states → E2E → integration/unit tests →
+metrics/logs → KB + project-skill update), decides
+`skills/projects/acme-shop/references/` needs a new `discount-codes.md`
+page, and records the decision via `memory-ontology`.
+
+**Phase 4 — Implement + verify.** The agent works the task list; per-task the
+relevant dev skills fire (`go-error-handling`, `go-testing`, `node-types`,
+`node-testing`, …). It runs the project's own commands (`make test`,
+`make lint`, `pnpm test`, `pnpm test:e2e`, `pnpm lint`) before opening the
+PR, whose description follows
+`agents/feature-development/references/feature-pr-template.md`. It runs
+`go-code-review` on the backend diff and `node-code-review` on the frontend
+diff, addresses findings, and the user exercises the feature in the browser
+before merge.
+
+**Phase 5 — Rollout + ship.** Per spec §9: flag on in dev → staging (a minor
+toast bug surfaces, quick patch) → hand off the alert rule to
+`devops-engineer` (`devops-observability` + `devops-incident-runbook`
+produce the rule + a one-paragraph runbook entry) → 10% prod canary for 24h
+→ 100%. Cleanup: final `requirement-audit`; `project-knowledge-base` writes
+`entities/discount.md` and its relations; the project skill gains
+`references/discount-codes.md`; the PRD section updates; a memory entry
+records the feature, PR, flag, and metrics; the spec flips to `shipped`. The
+agent emits a one-paragraph handoff with zero open follow-ups.
+
+### How the four layers showed up
+
+| Layer | Example 1 | Example 2 |
+|---|---|---|
+| **Instruction** | Produced `INSTRUCTIONS/projects/acme-shop/*` | Loaded it to anchor the feature against the right stack + commands |
+| **Agent** | None (skill-level chain) | `feature-development` owned the arc; engaged `devops-engineer` |
+| **Skill** | `project-onboarding`, `create-project-instruction`, `project-knowledge-base`, `requirement-audit` | `feature-spec`, language dev/test/lint/review, `cognitive-alignment`, `memory-ontology`, `requirement-audit` |
+| **Reference** | `INSTRUCTIONS/templates/*`, the new project skill's `references/` | feature-spec template + rubric, the feature-development reference set |
+
+Agents conduct, skills produce, instructions anchor, references give the
+producers a deterministic shape.
+
+**Common variations.** Non-English project → onboarding writes English
+INSTRUCTIONS, project-skill references in the project's language. Whole-system
+architectural feature → Phase 1 hands off to `architecture-shepherd` before
+spec. No new contract (a bug fix) → skip `feature-development`, use dev-*
+skills directly (Scenario I). Project not yet onboarded → run Example 1
+first; the framework refuses to spec features against an un-onboarded project.
 
 ---
 

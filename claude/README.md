@@ -81,13 +81,16 @@ claude/
     ├── dev-tools/                  # ccc (semantic search), doc-markdown-standards, omc-reference
     ├── design/                     # ui-ux-pro-max
     ├── knowledge-graph/            # book / long-text → ontology pipeline (6 skills)
-    ├── gtm/                        # go-to-market skills (lifecycle-pilot — 6 stubs)
-    ├── architecture/               # architecture upgrade skills (architecture-shepherd — 5 stubs)
-    ├── scenario/                   # scenario / workflow / group formation skills (scenario-strategist — 4 stubs)
-    ├── devops/                     # devops skills (devops-engineer — 7 stubs)
-    ├── enterprise-kb/              # enterprise KB skills (knowledge-curator — 5 stubs)
-    └── projects/                   # project-specific skills (e.g. stardust-rtl)
+    ├── gtm/                        # go-to-market skills (lifecycle-pilot — 6)
+    ├── architecture/               # architecture upgrade skills (architecture-shepherd — 5)
+    ├── scenario/                   # scenario / workflow / group formation skills (scenario-strategist — 4)
+    ├── devops/                     # devops skills (devops-engineer — 7)
+    └── enterprise-kb/              # enterprise KB skills (knowledge-curator — 5)
 ```
+
+Project-specific skills (skills that only apply inside one project) live
+under `skills/projects/<slug>/`, created on demand — see HOWTO.md
+"Per-project skills". None ship with the framework.
 
 ## Counts
 
@@ -107,16 +110,13 @@ claude/
 | `scenario/` | 4 |
 | `devops/` | 7 |
 | `enterprise-kb/` | 5 |
-| `projects/` | 1 |
-| **Total** | **146** (all shipped) |
+| **Total** | **145** (all shipped) |
 
 | Agents | Count |
 |---|---|
-| `agents/` (scaffold) | 6 |
+| `agents/` | 6 |
 
 Plus 13 portable instruction files under `INSTRUCTIONS/` and 2 templates.
-The top-level `REQUIREMENTS-AUDIT.md` records the verified completion of
-the framework-consolidation request that produced this revision.
 
 ## Three principles the framework enforces
 
@@ -133,11 +133,9 @@ the framework-consolidation request that produced this revision.
 ## Quick links
 
 - **First time using this?** See [HOWTO.md](HOWTO.md).
-- **Want two worked end-to-end examples?** See
-  [HOWTO-EXAMPLES.md](HOWTO-EXAMPLES.md) — onboarding an existing
-  project, and adding a feature to one.
 - **Want a step-by-step playbook for a common situation?** See
-  [SCENARIOS.md](SCENARIOS.md).
+  [SCENARIOS.md](SCENARIOS.md) — 21 scenarios plus two fully worked
+  end-to-end examples (onboarding a project, and adding a feature).
 - **Which agents own which jobs?** See [agents/README.md](agents/README.md).
 - **Current build status of agents + new skills?** See
   [agents/CHECKLIST.md](agents/CHECKLIST.md).
@@ -148,61 +146,27 @@ the framework-consolidation request that produced this revision.
 - **Before `/compact`?** See `skills/share/compact-ritual/`.
 - **Verifying a multi-point request was actually delivered?** Run
   `requirement-audit`; the audit format is in
-  [REQUIREMENTS-AUDIT.md](REQUIREMENTS-AUDIT.md).
+  `skills/share/requirement-audit/references/audit-template.md`.
 - **Adding a new scenario or asking what skills a workflow will use?**
   Run `scenario-checklist`.
 - **Captured a "this skill should be sharper" observation during live
   work?** Run `skill-evolution` to write a proposal, then `skill-merge`
   to apply it when ready. See `HOWTO.md` "Evolving a skill through use".
 
-## What changed in this revision
+## Keeping the framework alive
 
-This framework was consolidated to remove conflicts and gaps. See
-[the SCENARIOS doc's appendix](SCENARIOS.md#appendix-checklists) for the
-full audit summary. Key changes:
+The framework does not rewrite itself silently, but it has two
+human-checkpointed loops for staying current:
 
-- INSTRUCTIONS rewritten to portable English; project-specifics moved to
-  `INSTRUCTIONS/projects/<slug>/`.
-- `cognitive-alignment` consolidated (the bilingual variant was folded in).
-- Two new shared meta-skills: `memory-ontology` and `compact-ritual`.
-- `skills/ontology/` renamed to `skills/knowledge-graph/` to disambiguate
-  from the MEMORY ontology.
-- Three new project skills: `project-onboarding`, `project-knowledge-base`,
-  and `create-project-instruction` (the focused INSTRUCTIONS producer).
-- The Chinese-language `go-stardust-rtl` skill was moved out of the portable
-  `skills/dev-go/` namespace into a new `skills/projects/` namespace as
-  `stardust-rtl`, marked as an example of a project-specific skill produced
-  through onboarding.
-- Two new audit / checklist meta-skills under `share/`: `requirement-audit`
-  (verifies a numbered requirements list with PASS/PARTIAL/FAIL evidence)
-  and `scenario-checklist` (produces the "Skills involved" table for any
-  workflow).
-- Two new evolution meta-skills under `share/`: `skill-evolution`
-  (captures evolution candidates during live use as reviewable proposals)
-  and `skill-merge` (applies accepted proposals with conflict detection
-  and downstream consistency checks). Together they form the observe →
-  propose → merge loop so the framework can sharpen itself through use
-  without silent file rewrites.
-- A version-tuning skill family under `share/` that retunes any framework
-  layer to make full benefit of a named Claude model or Claude Code harness
-  version. Three layer dispatchers share four per-version capability workers:
-  `skill-version-tune` (skills), `agent-version-tune` (agents, AGENT.md), and
-  `instructions-version-tune` (always-loaded INSTRUCTIONS) all load the same
-  provenance-tagged capability sheets — `tune-for-opus-4-6`, `tune-for-opus-4-7`,
-  `tune-for-opus-4-8`, `tune-for-cc-harness` (`(confirmed)` vs `(inferred)`).
-  Each dispatcher applies its own layer lens and emits `skill-evolution`
-  proposals (reusing the merge loop — no silent rewrites), stamping an additive
-  `tuned-for:` field on what it tunes. The agent dispatcher branches to
-  `agent-create` — a new skill that scaffolds and registers a brand-new agent
-  (AGENT.md + CHECKLIST + README) — when a version makes a whole new role
-  viable; `agent-create` is also the destination for `agent-group-formation`'s
-  "create new agent" recommendation.
-- All cross-cutting workflows documented in `SCENARIOS.md` with checklists,
-  including Scenario K (framework self-audit) and Scenario L (evolving a
-  skill through live project use).
-- `REQUIREMENTS-AUDIT.md` at the framework root records the explicit
-  verification that the framework-consolidation request was satisfied
-  end-to-end.
+- **Evolution loop** (failure-driven). When live work shows a skill could be
+  sharper, `skill-evolution` captures a reviewable proposal and `skill-merge`
+  applies it after you approve the diff. See HOWTO.md "Evolving a skill
+  through use" and SCENARIOS.md Scenario L.
+- **Version-tuning family** (capability-driven). When a new Claude model or
+  Claude Code harness version lands, the `*-version-tune` dispatchers walk a
+  layer against per-version capability sheets and emit the same kind of
+  proposals. See HOWTO.md "Updating a skill, agent, or instructions for a new
+  model or harness version" and SCENARIOS.md Scenario U.
 
 ## License and authorship
 
