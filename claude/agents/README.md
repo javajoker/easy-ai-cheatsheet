@@ -106,7 +106,7 @@ companion_agents: [list]
 
 ## Adding a new agent
 
-> The `agent-create` skill (`skills/share/agent-create/`) mechanizes the six
+> The `agent-create` skill (`maintenance/agent-create/`) mechanizes the six
 > steps below — it qualifies the role against the "job, not a task" bar,
 > drafts the AGENT.md from the frontmatter contract, and applies the
 > registration (CHECKLIST + README + SCENARIOS/orchestrator follow-ups) with
