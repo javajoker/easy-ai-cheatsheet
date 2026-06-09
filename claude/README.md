@@ -1,7 +1,7 @@
 # ai-claude — Claude Code skills + instructions + agents framework
 
 A portable, project-agnostic framework for using Claude Code consistently across
-many projects. It combines three layers:
+many projects. It combines three content layers plus a maintenance layer:
 
 - **`INSTRUCTIONS/`** — universal engineering principles and conventions
   always loaded by Claude.
@@ -10,6 +10,9 @@ many projects. It combines three layers:
 - **`agents/`** — named roles that bundle a workflow, a set of skills, and a
   deliverable contract for a specific job (lifecycle, architecture upgrade,
   scenario strategy, devops, enterprise knowledge base, feature development).
+- **`maintenance/`** — the framework's self-tuning layer: skills that retune
+  the three layers above to a new Claude model or Claude Code harness version
+  (Scenario U). See [`maintenance/README.md`](maintenance/README.md).
 
 The framework is **English-first** so the model can maintain it uniformly.
 Project output (code, docs, user-facing copy, conversational restate phrases)
@@ -41,6 +44,17 @@ claude/
 │   ├── devops-engineer/            # CI/CD, IaC, observability, runbooks, secrets
 │   ├── knowledge-curator/          # enterprise knowledge base upgrade
 │   └── feature-development/        # add a feature to an onboarded project
+├── maintenance/                    # framework self-tuning to model/harness versions (Scenario U)
+│   ├── README.md                   # the maintenance layer rationale + family shape
+│   ├── skill-version-tune/         # retunes a skill for a model/harness version (dispatcher)
+│   ├── agent-version-tune/         # retunes an agent (AGENT.md) for a version (dispatcher)
+│   ├── instructions-version-tune/  # retunes an INSTRUCTIONS file for a version (dispatcher)
+│   ├── agent-create/               # scaffolds + registers a new agent
+│   └── versions/                   # per-model / per-harness capability sheets (shared workers)
+│       ├── tune-for-opus-4-6/      # Opus 4.6 capability lens
+│       ├── tune-for-opus-4-7/      # Opus 4.7 capability lens
+│       ├── tune-for-opus-4-8/      # Opus 4.8 capability lens
+│       └── tune-for-cc-harness/    # current CC harness capability lens
 └── skills/
     ├── share/                      # cross-cutting meta-skills
     │   ├── skill-orchestrator/     # picks and chains skills for multi-step tasks
@@ -50,15 +64,7 @@ claude/
     │   ├── requirement-audit/      # PASS/PARTIAL/FAIL checklist of a multi-point ask
     │   ├── scenario-checklist/     # produces the "Skills involved" table for a workflow
     │   ├── skill-evolution/        # captures live-use evolution candidates as proposals
-    │   ├── skill-merge/            # applies accepted proposals with conflict detection
-    │   ├── skill-version-tune/     # retunes a skill for a model/harness version (dispatcher)
-    │   ├── agent-version-tune/     # retunes an agent (AGENT.md) for a version (dispatcher)
-    │   ├── instructions-version-tune/  # retunes an INSTRUCTIONS file for a version (dispatcher)
-    │   ├── agent-create/           # scaffolds + registers a new agent
-    │   ├── tune-for-opus-4-6/      # Opus 4.6 capability lens (shared worker)
-    │   ├── tune-for-opus-4-7/      # Opus 4.7 capability lens (shared worker)
-    │   ├── tune-for-opus-4-8/      # Opus 4.8 capability lens (shared worker)
-    │   └── tune-for-cc-harness/    # current CC harness capability lens (shared worker)
+    │   └── skill-merge/            # applies accepted proposals with conflict detection
     ├── ideas/                      # project lifecycle (12 skills)
     │   ├── README.md               # the project quick-start narrative
     │   ├── WORKFLOW.md             # detailed phase-by-phase walkthrough
@@ -96,7 +102,8 @@ under `skills/projects/<slug>/`, created on demand — see HOWTO.md
 
 | Group | Skills |
 |---|---|
-| `share/` | 16 |
+| `maintenance/` | 8 |
+| `share/` | 8 |
 | `ideas/` | 12 |
 | `dev-go/` | 20 |
 | `dev-node/` | 20 |
@@ -163,10 +170,13 @@ human-checkpointed loops for staying current:
   applies it after you approve the diff. See HOWTO.md "Evolving a skill
   through use" and SCENARIOS.md Scenario L.
 - **Version-tuning family** (capability-driven). When a new Claude model or
-  Claude Code harness version lands, the `*-version-tune` dispatchers walk a
-  layer against per-version capability sheets and emit the same kind of
-  proposals. See HOWTO.md "Updating a skill, agent, or instructions for a new
-  model or harness version" and SCENARIOS.md Scenario U.
+  Claude Code harness version lands, the `*-version-tune` dispatchers under
+  [`maintenance/`](maintenance/README.md) walk a layer against per-version
+  capability sheets (`maintenance/versions/`) and emit the same kind of
+  proposals. The `maintenance/` folder is self-contained — see
+  [`maintenance/HOWTO.md`](maintenance/HOWTO.md) for the mechanics and
+  [`maintenance/SCENARIO-U.md`](maintenance/SCENARIO-U.md) for the full
+  playbook.
 
 ## License and authorship
 

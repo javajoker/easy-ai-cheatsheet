@@ -1,7 +1,8 @@
 # ai-claude — Claude Code skills + instructions + agents framework
 
 A portable, project-agnostic framework for using Claude Code consistently
-across many projects. It combines three layers:
+across many projects. It combines three content layers plus a maintenance
+layer:
 
 - **`claude/INSTRUCTIONS/`** — universal engineering principles and
   conventions, always loaded.
@@ -9,6 +10,8 @@ across many projects. It combines three layers:
   their descriptions match the request.
 - **`claude/agents/`** — named roles that bundle a workflow, a set of
   skills, and a deliverable contract for a specific job.
+- **`claude/maintenance/`** — the framework's self-tuning layer: skills that
+  retune the three layers above to a new Claude model or harness version.
 
 Everything lives under [`claude/`](claude/). Start there:
 
