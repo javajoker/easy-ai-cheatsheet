@@ -48,11 +48,26 @@ top.
    - Tighten sampling around the member's *known* weak spots — the
      scorecard's PARTIAL/trap rows say where to look (see EXAMPLES.md
      Example 2).
+   - **Confidence modulates depth one way only.** If the return carries a
+     self-reported `confidence` (optional kit field) and it is *low*,
+     verify one notch *deeper* — treat an A like a B for this return, or
+     pre-empt the escalation ladder before reading further. High
+     self-confidence **never** buys lighter verify: a member sure of
+     buggy output is the exact case the gate exists for. Confidence can
+     only raise scrutiny.
 
 Across all rungs, hunt the **plausible-wrong** specifically: output that
 reads well and is subtly wrong (asserting buggy behaviour, inverted
 negation, translated brand term). That is the failure mode external
 delegation imports, and the one consensus is worst at catching.
+
+**Style is a criterion, not a nicety.** Heterogeneous members produce
+divergent voice, formatting, and terminology — the consistency problem.
+The kit's acceptance criteria carry the house style (voice, heading
+shape, term usage), so check it as a real PASS/PARTIAL/FAIL row, not a
+vibe. A member output that is correct but off-voice is a PARTIAL with a
+named gap (normalize in-house or escalate), never a silent accept that
+lets the repo drift into N writing styles.
 
 ## Procedure
 
@@ -167,6 +182,9 @@ settles on `schema`/`deterministic`/`cross-validate` alone).
   peer's work *as the integration decision* re-imports the exact risk
   the gate exists to stop. Peer agreement may filter low-stakes output
   or escalate the hard case; it never merges a delta by itself.
+- **Confidence as a pass.** A high self-reported `confidence` is the
+  generator grading itself — the purest form of self-grading. It may
+  *deepen* verify when low; it may never lighten or skip it when high.
 - **Member-authored oracle.** A results oracle the member wrote (its own
   tests) is self-grading wearing a deterministic costume. The oracle is
   authored in-house or by the kit.

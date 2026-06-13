@@ -56,11 +56,20 @@ fail acceptance, cut it.
   "context": { <minimal project bindings: glossary, conventions — by value, not by reference> } }
 ### Output delta (JSON schema)
 { "outputs": { <named keys the ledger will merge> },
-  "notes": "<member's caveats — surfaced to verify, never auto-trusted>" }
+  "notes": "<member's caveats — surfaced to verify, never auto-trusted>",
+  "confidence": <optional 0–1 self-report — a SIGNAL for squad-verify:
+                 may only deepen verify when low, never lighten it when
+                 high; never a pass> }
 
 ## Acceptance criteria
 The PASS/PARTIAL/FAIL rows squad-verify will apply — identical to the
 eval rubric rows, so eval performance predicts production performance.
+Include the **style/normalization** rows: house voice, heading shape,
+terminology, formatting conventions. Heterogeneous members diverge in
+style by default; the kit is where that divergence is normalized — at
+author time, as checkable criteria — so the repo doesn't drift into N
+voices (the consistency concern). A correct-but-off-voice return is a
+PARTIAL, not a silent accept.
 
 ## Worked example
 One small input payload → one correct output delta. (Few-shot anchor;

@@ -56,7 +56,20 @@ Cheapest cost band wins; within a band, the better measured result for
 this task class (kit rating first); still tied → lower measured latency.
 In-house is the choice when no member survives the filter, when the task
 needs session context (cold-start members can't have it), or when the
-task is so small that routing overhead exceeds the work.
+**all-in cost won't beat the in-house baseline** — that is the member
+band *plus the orchestration tax* (this lead's own classify/route/verify
+tokens) *plus expected verify-and-escalation overhead*, compared against
+Claude just doing it. Routing a $0.02 task that costs $0.05 to route and
+check is a loss the layer exists to avoid; the estimate below makes that
+comparison explicit, and in-house is a first-class answer to it.
+
+**Confidence as a re-route input.** If this route is the escalation step
+after a prior return, read that return's self-reported `confidence` (the
+optional kit field): a member that *flagged its own low confidence*
+should not get the one same-member retry (it already told you it would
+fail) — skip straight to the next-ranked fallback. High self-confidence
+never shortcuts anything (it is the generator grading itself); it is
+verify's job, not routing's, to disbelieve it.
 
 **Cross-validate gate → select cross-vendor peers.** If the node's gate
 is `cross-validate`, resolve **≥2 eligible members from different
@@ -77,6 +90,8 @@ task class / stakes / data: <…>
 eligible:  <member (rating, band, clearance)>…
 excluded:  <member — first failed filter>…
 chosen:    <member> · estimated cost: <band × volume>
+all-in:    <member est + orchestration tax + expected verify/escalation>
+baseline:  <est. in-house cost for the same task>   # route only if all-in < baseline
 gate:      <schema|deterministic|cross-validate|in-house>   # under lead=common, what carries verification
 fallback:  <next-ranked member or in-house>
 ```
@@ -99,6 +114,12 @@ where routing pressure actually is.
   verify fails or the ledger looks wrong.
 - **Routing for routing's sake.** In-house is a first-class answer, not
   a defeat — the layer exists to make the *choice* deliberate.
+- **Ignoring the orchestration tax.** Comparing the member's band against
+  in-house while forgetting the lead's own routing + verify tokens makes
+  every route look cheaper than it is. Compare all-in vs. baseline.
+- **Trusting confidence to route up.** A member's high self-confidence is
+  not eligibility — only `(measured)` ratings are. Confidence may only
+  *redirect an escalation*, never grant a route.
 
 ## Companion skills
 

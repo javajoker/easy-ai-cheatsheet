@@ -131,8 +131,11 @@ entries.
 6. **Ledger.** Per dispatch: estimated vs. actual cost, outcome,
    escalations — into `docs/squad/ledger.md`; job ledgers reconcile on
    close. The ledger is the proof the layer pays for itself: the
-   number that matters is **cost per accepted task** (member + verify +
-   escalation overhead) vs. in-house.
+   number that matters is **all-in cost per accepted task** (member +
+   **orchestration tax** + verify + escalation overhead) vs. the
+   **`baseline`** in-house figure recorded beside it. That pair turns the
+   ledger into a running squad-vs-in-house benchmark — the layer keeps a
+   task class only while all-in < baseline.
 
 ### Phase 5 — Learn (rating feedback + `member-retune` + playbook)
 

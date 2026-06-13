@@ -145,6 +145,10 @@ inventing new discipline:
    judgment**. Consensus is a filter, never a certificate; no member ever
    self-certifies into the repo. The verifier's *required* power is set
    by the task class, not chosen — see the configurations below.
+   **A member's self-reported confidence is a signal, never a certificate
+   either:** it can only *raise* scrutiny (low confidence deepens verify
+   or pre-empts escalation), never lower a gate. A member confident in
+   its own work is still graded by the verifier.
 5. **Structured handoffs, not chat.** Members never inherit
    conversational history; they receive hydrated payloads (only the
    ledger keys their node declares) and return schema-checked deltas.
@@ -153,11 +157,57 @@ inventing new discipline:
 6. **Data sensitivity gates routing.** A task touching secrets, customer
    data, or unreleased code only routes to members whose sheet has the
    data-handling section cleared by a human. When in doubt, in-house.
-7. **The ledger learns.** Every dispatch records estimated vs. actual cost
-   and the verify outcome; jobs run under a budget with an 80% circuit
-   breaker. Ratings move on evidence — two verified failures demote;
+7. **The ledger learns, and counts the tax.** Every dispatch records
+   estimated vs. actual cost and the verify outcome; jobs run under a
+   budget with an 80% circuit breaker. The cost it records is **all-in**:
+   the member spend *plus the orchestration tax* — the lead's own
+   classify/route/verify tokens — and beside it a **`baseline`** figure
+   (what in-house would have cost). The layer only earns its place when
+   all-in < baseline, so that comparison is a column, not an article of
+   faith — and `squad-plan` declines a job whose all-in can't beat
+   baseline. Ratings move on evidence — two verified failures demote;
    sustained passes promote — always through a diff-previewed roster
    edit; successful job plans distill into a reusable playbook.
+
+## Two governance tiers, and the role/permission model
+
+Governance in this layer is a **stack of two tiers**, and the upper one
+gates the lower:
+
+- **Strategic tier — the outsourcing policy.** *Whether* a piece of work
+  may leave in-house at all. It is set by a human, at onboarding (the
+  data-handling clearance — what data classes a vendor may ever see) and
+  at classify time (stakes, value/safety constraints, vendor trust). A
+  task the strategic tier forbids never reaches routing, however cheap a
+  member looks.
+- **Tactical tier — the wire contract.** *How* permitted work crosses
+  members without losing control: the kit's JSON input/output contract,
+  the State Ledger schema, and the five gates. This is the factory floor;
+  the strategic tier is the licence to operate it.
+
+This is the concrete form of the **"structured professional roles +
+permission boundaries"** model: a member's **per-task-class rating** is
+its professional role (what it is *qualified* to do, by `(measured)`
+evidence — A clears `ship`, C clears `throwaway`), and its
+**data-handling clearance** is its permission boundary (what it may ever
+*touch*). Routing is exactly role-based access control: qualified **and**
+cleared **and** active, then cheapest. Neither axis substitutes for the
+other — a brilliant member with no clearance for the data stays
+in-house, and a cleared member with a U rating takes nothing that
+matters.
+
+## Squad inside a Loop
+
+Squad is the level-5 paradigm that extends **Loop Engineering** (level 4
+— recursive self-correction within one model); the references trace the
+lineage. Operationally the relationship is direct: the **execution loop**
+(route → dispatch → verify → escalate, bounded by the 80% breaker) *is* a
+controlled Loop, and Squad is its per-step **execution engine** — each
+iteration runs a sub-task on the cheapest cleared member instead of on
+the one flagship. The escalation ladder and the budget breaker are the
+loop's termination conditions; the State Ledger is its memory. A
+framework Loop drives the squad; the squad does not replace it. The two
+compose.
 
 ## Lead–member power configurations
 
@@ -229,6 +279,7 @@ In this folder (canonical):
 - **Who can do what, today:** [ROSTER.md](ROSTER.md)
 - **The kit contract:** [kits/README.md](kits/README.md)
 - **Design sources + concept map:** [references/README.md](references/README.md)
+- **Review response (challenges + suggestions → where each landed):** [references/04-review-response.md](references/04-review-response.md)
 
 Elsewhere in the framework:
 

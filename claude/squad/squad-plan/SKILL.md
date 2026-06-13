@@ -112,12 +112,31 @@ patterns not presets:
 - **Context isolation by design.** If a node "needs" most of the
   ledger, the decomposition is wrong — split or merge nodes until each
   reads narrowly.
+- **Dedup before fan-out.** In a bulk fan-out (40 configs, 14 docs),
+  collapse **identical-after-normalization** inputs to one dispatch and
+  fan the verified result back across the duplicates — don't pay per
+  copy. Near-duplicates that differ only in a parameter are a single
+  kit call with that parameter in the payload, not N calls.
+- **Reuse verified results (the result cache).** Before dispatching a
+  node, check `squad-state`'s verified-result cache for an identical
+  kit + payload that already PASSed; a hit reuses the verified delta for
+  free. This is the result-level twin of `docs/squad/playbook/` (which
+  caches plan *shapes*). The caveats are load-bearing: **only verified
+  results cache**, a hit still respects the input's **data class**, and a
+  cache entry inherits the `(stale)` discipline when its kit re-derives.
 
 ### Phase 3 — Budget and breaker
 
 Set the **job budget** from the routing estimates of all nodes plus
-expected escalation overhead. The ledger tracks `spent_so_far`; at
-**80% of cap without the end in sight, the circuit breaker trips**:
+expected escalation overhead **plus the orchestration tax** — the lead's
+own planning, per-node routing, and verification tokens, which on a small
+job can rival the member spend. Record the job's **baseline** too (what
+in-house would cost end to end): a job whose all-in (members + tax +
+verify) can't beat baseline should not be planned — say so and hand it
+back to in-house. That guard is the answer to the orchestration-tax
+critique: the tax is budgeted, not hidden. The ledger tracks
+`spent_so_far`; at **80% of cap without the end in sight, the circuit
+breaker trips**:
 execution pauses, the user gets the state summary (verified entries,
 remaining nodes, spend) and chooses — raise the cap, simplify the
 remaining plan, or take the rest in-house. Hitting the breaker is a
@@ -166,6 +185,10 @@ recurring, distill the plan (with actuals) into
 - **Breaker top-ups by reflex.** The breaker pauses *to ask a human a
   real question*. "Raise it and continue" without reading the state
   summary defeats it.
+- **Tax-blind budgeting.** A plan whose budget counts only member spend
+  hides the orchestration tax and the verify cost — the very costs that
+  can make a squad job lose to in-house. Budget all-in; compare to
+  baseline; decline when it can't win.
 - **Re-planning on node failure.** Node failures are the ladder's job.
   Re-plan only when the *decomposition* proved wrong (a node's contract
   was unfulfillable), and say so in the plan's history.

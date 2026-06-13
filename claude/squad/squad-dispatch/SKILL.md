@@ -53,6 +53,9 @@ Run it. Capture into `docs/squad/dispatches/<date>-<slug>.md`:
 - Output: stdout inline (or referenced if huge); file changes as a diff
   against the sandbox baseline.
 - Cost actually metered (or band estimate when not meterable) + latency.
+- The return's self-reported `confidence`, if the kit's output schema
+  carries the field — recorded as a **signal for `squad-verify`**, never
+  acted on here (dispatch integrates nothing).
 
 Hangs hit the timeout and are recorded as failures; partial output is
 kept in the record (it may still inform the retry's gap notes).
@@ -63,7 +66,11 @@ kept in the record (it may still inform the retry's gap notes).
   never merges sandbox changes** — outputs stay quarantined until
   verify's PASS.
 - Append the ledger line to `docs/squad/ledger.md`:
-  `| date | task class | member | estimated | actual | <verify outcome — filled by squad-verify> | escalations |`.
+  `| date | task class | member | estimated | actual (all-in: member + orchestration tax + verify) | baseline (in-house est.) | <verify outcome — filled by squad-verify> | escalations |`.
+  A reused result writes a `cache-hit` line with zero member cost (see
+  `squad-state`'s verified-result cache). The **all-in vs. baseline**
+  pair is what makes the ledger a running squad-vs-in-house benchmark,
+  not just a spend log.
 
 ## Anti-patterns
 

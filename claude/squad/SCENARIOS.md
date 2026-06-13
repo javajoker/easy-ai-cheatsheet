@@ -122,6 +122,22 @@ agent/skill discipline?"*
 | `requirement-audit` | shipped (share) | The underlying audit row format. |
 | `memory-ontology` | shipped (share) | Records a multi-session eval pass so it resumes. |
 
+### The calibration run (squad vs. baseline benchmark)
+
+A rating says a member *can* do the task; it doesn't prove routing it
+*pays*. To get that — the quantitative read the layer's whole premise
+rests on — run the eval as a **calibration run**: dispatch the golden set
+both ways, **to the member(s) and to in-house**, and report the four
+numbers per side — **cost, quality (PASS rate), latency, success rate** —
+with the member side counting its **all-in** cost (member + orchestration
+tax + verify + expected escalation), not just the band. The output is a
+small table in the scorecard: *squad all-in vs. in-house baseline* for
+this task class at this volume. That table is what justifies (or retires)
+the layer for the class — and it reuses the eval path entirely, so it
+costs one extra in-house pass, not a separate benchmark harness. Re-run
+it when a member version changes (Scenario Y) or the ledger's live
+baseline gap drifts from what calibration predicted.
+
 ### Manual fallback
 
 Write 5 representative prompts, run them through each member's CLI by

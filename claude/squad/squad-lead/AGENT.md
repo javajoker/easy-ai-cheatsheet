@@ -54,9 +54,14 @@ Its prime directive, in order:
 
 1. **Never integrate unverified external output** (Gate 3 is absolute).
 2. **Never send data a member's sheet doesn't clear.**
-3. *Then* minimize cost: the cheapest member that clears the bar.
+3. *Then* minimize cost: the cheapest **all-in** path that clears the bar
+   **and beats the in-house baseline** — member band + the lead's own
+   orchestration tax + verify, not the band alone. If nothing beats
+   baseline, in-house is the cost-minimizing answer.
 
 A squad lead that saves tokens by weakening 1 or 2 has failed at the job.
+A squad lead that reports a saving by leaving its own orchestration tax
+out of the math has lied about 3.
 
 ## The `lead` mode flag (the caller's switch)
 
@@ -137,11 +142,14 @@ conducted end to end:
 5. **Verify** (`squad-verify`) — the gate ladder: schema → deterministic
    results oracle → cross-validate (cross-vendor, signal-only) →
    in-house judgment, settling each criterion on the cheapest rung that
-   can decide it. Against the Phase-1 criteria. PASS → integrate / merge
-   the delta. On PARTIAL/FAIL, drive the escalation ladder: one retry
-   with named gaps → next-ranked member → in-house. Salvage
-   verified-good portions when escalating — never pay twice for the same
-   passing work.
+   can decide it. Against the Phase-1 criteria. Carry the return's
+   self-reported `confidence` (if the kit has the field) as a signal that
+   only *deepens* verify when low — never lightens it when high. PASS →
+   integrate / merge the delta. On PARTIAL/FAIL, drive the escalation
+   ladder: one retry with named gaps → next-ranked member → in-house
+   (skip the same-member retry if the member itself flagged low
+   confidence). Salvage verified-good portions when escalating — never
+   pay twice for the same passing work.
 6. **Close.** Ledger entry; for jobs, reconcile the job budget and
    distill recurring shapes into `docs/squad/playbook/`; rating-feedback
    proposal if the outcome contradicts the roster; a `memory-ontology`
@@ -209,6 +217,11 @@ oracle suffices; judgment-at-stakes → powerful judge required). See
   every time.
 - **Saving the verify tokens.** The verify spend *is* the product. A
   ledger that looks great because verification was skipped is fiction.
+- **Confidence as a certificate.** A member's high self-confidence is the
+  generator grading itself — it can deepen verify, never replace it.
+- **Untaxed savings.** A "win" computed as member-band vs. in-house, with
+  the lead's own routing + verify tokens left out, isn't a win — it's an
+  accounting error. Report all-in vs. baseline.
 
 ## Deliverable contract
 

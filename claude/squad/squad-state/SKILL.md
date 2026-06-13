@@ -88,6 +88,33 @@ quirk, a reusable plan) distill into `memory-ontology` /
 `docs/squad/playbook/`; the ledger itself stays with the job as the
 audit record. Nothing reads a closed job's ledger as live state.
 
+## The verified-result cache (cross-job result reuse)
+
+The per-job ledger is working memory; the **verified-result cache** is
+the cross-job twin — content-addressed result reuse, the result-level
+counterpart to `docs/squad/playbook/`'s plan-shape reuse. It lives at
+`docs/squad/cache/` and answers the suggestion to cache and dedup beyond
+plan shapes.
+
+- **Key.** A hash of `kit@version` + the **normalized** payload (the same
+  normalization `squad-plan`'s dedup uses) + the input data class.
+- **Value.** The **verified** delta and the verification report that
+  passed it. Only PASS results are ever written — a quarantined or FAILed
+  delta never caches.
+- **Hit.** `squad-plan`/`squad-dispatch` finds a matching key →
+  reuse the verified delta for free, recording a `cache-hit` ledger line
+  (zero member cost). A hit still **respects the data class**: a cache
+  entry built from `public` input cannot serve a `sensitive` payload even
+  if the bytes match, and vice versa.
+- **Invalidation.** A cache entry inherits the `(stale)` discipline: when
+  its kit re-derives (contract or criteria change) or the source skill
+  version-tunes, the entry is evicted, not silently served. Stale results
+  are worse than a cache miss.
+
+Dedup (collapsing identical inputs *within* one fan-out) and the cache
+(reusing verified results *across* jobs) compose: dedup avoids paying
+twice in one job; the cache avoids paying again next week.
+
 ## Procedure (conducting state for a job)
 
 1. **Open** — create the ledger at job start (`squad-plan` does this
@@ -120,6 +147,12 @@ audit record. Nothing reads a closed job's ledger as live state.
 - **Summary-free artifacts.** An artifact only vision members can
   consume splits the squad's shared memory by modality — the summary
   is what keeps it shared.
+- **Caching the unverified.** A result cache that stores anything but a
+  PASSed delta serves yesterday's bug for free forever. Only verified
+  results cache, and a stale kit evicts its entries.
+- **Data-class-blind cache hits.** Serving a cache entry across data
+  classes because "the bytes match" leaks the boundary the strategic
+  tier set. The class is part of the key.
 
 ## Companion skills
 

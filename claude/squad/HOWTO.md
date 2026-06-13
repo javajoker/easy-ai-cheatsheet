@@ -184,11 +184,12 @@ old version, and proposes which evals to re-run (not all — only task
 classes where the version plausibly moved the result). Old `(measured)`
 evidence is demoted to `(stale)` until re-measured, never silently kept.
 
-## Four disciplines that keep it honest
+## Five disciplines that keep it honest
 
 - **Never route on `(claimed)`.** Vendor benchmarks decide *what to
   evaluate first*, never *who gets work*. Only `(measured)` evidence moves
-  a rating above U.
+  a rating above U. A member's self-reported `confidence` is the same:
+  a signal that can deepen verify when low, never a route or a pass.
 - **Verification is in-house and non-negotiable.** The point of the layer
   is to spend Claude tokens on verification instead of generation. Skipping
   verify to save the verify cost re-imports the risk you delegated away.
@@ -199,6 +200,12 @@ evidence is demoted to `(stale)` until re-measured, never silently kept.
   take throwaway drafts; shipping code needs A or B plus full verify. A
   task touching sensitive data needs a cleared data-handling section — or
   it stays in-house.
+- **Count the tax; beat the baseline.** The cost that matters is
+  **all-in** — the member band *plus this lead's own orchestration tokens*
+  *plus verify* — measured against the **baseline** of Claude just doing
+  it. The ledger records both; route only when all-in wins. Dedup
+  identical inputs and reuse verified results (`squad-state`'s cache) to
+  widen that margin, but never let a saving skip a gate.
 
 ## How this differs from neighbouring machinery
 
