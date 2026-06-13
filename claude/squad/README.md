@@ -81,9 +81,9 @@ squad/
 Run artifacts live in the **project**, not in this layer:
 `docs/squad/evals/` (eval reports), `docs/squad/jobs/` (job plans +
 State Ledgers), `docs/squad/dispatches/` (dispatch records),
-`docs/squad/playbook/` (reusable job plans), and `docs/squad/ledger.md`
-(the cost ledger) — the same convention as `docs/skill-evolution/` for
-proposals.
+`docs/squad/playbook/` (reusable job plans), `docs/squad/cache/` (the
+verified-result cache), and `docs/squad/ledger.md` (the cost ledger) —
+the same convention as `docs/skill-evolution/` for proposals.
 
 ## The shape of the family
 

@@ -320,8 +320,10 @@ target is won or lost.
 ### Procedure
 
 1. Invoke the [`squad-lead`](squad-lead/AGENT.md) agent (optionally with
-   `lead=common` / `situation=2`; omit for the `powerful` default). It
-   resolves the `lead` mode, then classifies and recognizes a *job*
+   `lead=common` / `situation=2`, and/or `gate=auto`|`auto-unsafe`,
+   and/or `check=<name>`; omit any for its safe default —
+   `powerful` / `human` / in-house ladder). It resolves all three flags
+   into the plan header, then classifies and recognizes a *job*
    (multi-stage), not a task.
 2. [`squad-plan`](squad-plan/) checks the playbook for a reusable plan,
    else inherits the **verifier posture** from the caller's `lead` flag

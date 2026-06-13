@@ -113,9 +113,15 @@ walking the gate ladder above per criterion: settle on `schema` /
 
 - **PASS** — integrate from the sandbox (now it's allowed), note any
   trivial fixes made in-house in the report.
-- **PARTIAL** — surface the gap rows; integrate **only** what the user
-  explicitly accepts; the rest follows the FAIL path.
-- **FAIL** — nothing integrates. Escalation ladder, in order:
+- **PARTIAL** — surface the gap rows; integrate **only** the accepted
+  gaps, the rest follows the FAIL path. *Who accepts* follows the gate
+  mode (Phase 0): under `human` the user accepts each gap; under `auto` a
+  sub-`ship` PARTIAL auto-accepts its gaps (recorded) while a
+  `ship`-stakes PARTIAL still pauses for the user; under `auto-unsafe` a
+  `ship`-stakes PARTIAL auto-accepts (recorded, flagged). The gaps are
+  always written down — auto-acceptance is logged acceptance, not silent.
+- **FAIL** — nothing integrates, **in any mode** (the invariant no `gate`
+  value touches). Escalation ladder, in order:
   1. **One retry** to the same member, with the failed rows quoted as
      named gaps in the new prompt. One. Per member, per task.
   2. **Next-ranked member** from the routing decision's fallback —

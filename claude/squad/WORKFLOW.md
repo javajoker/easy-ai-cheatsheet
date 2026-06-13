@@ -112,12 +112,15 @@ routing when present). The org disciplines:
 **In:** a task or a job. **Out:** integrated work + records + ledger
 entries.
 
-1. **Resolve `lead` mode + classify** (`squad-lead`). Read the caller's
-   `lead` flag (`powerful` default if unset — Situation 1; `common` for
-   Situation 2) and carry it as the verifier posture. Then: task
-   class/kit; stakes (`throwaway`/`internal`/`ship`); data sensitivity.
-   Acceptance criteria are fixed **now** (the kit's criteria, when one
-   exists) — criteria written after seeing output are not criteria.
+1. **Resolve the flags + classify** (`squad-lead`). Read the caller's
+   three flags, each defaulting to its safe value: `lead`
+   (`powerful` default — Situation 1; `common` for Situation 2, the
+   verifier posture), `gate` (`human` default — `auto`/`auto-unsafe` set
+   the approval mode), and `check` (`default` in-house ladder — or a
+   registered verifier). Then: task class/kit; stakes
+   (`throwaway`/`internal`/`ship`); data sensitivity. Acceptance criteria
+   are fixed **now** (the kit's criteria, when one exists) — criteria
+   written after seeing output are not criteria.
 2. **Plan — jobs only** (`squad-plan`). Multi-stage work becomes a DAG:
    nodes bind **kits + cost tiers** (never member names — members
    resolve at dispatch time, so a roster change re-routes the next node
@@ -188,6 +191,7 @@ which is exactly the pre-squad baseline.
 | Verification report | inside the dispatch record | `squad-verify` |
 | Cost ledger | `docs/squad/ledger.md` | `squad-dispatch` + `squad-verify` |
 | Playbook (reusable plans) | `docs/squad/playbook/<shape>.md` | `squad-plan` (Phase 5 distillation) |
+| Verified-result cache | `docs/squad/cache/` | `squad-state` (writes verified PASS deltas; `squad-plan` / `squad-dispatch` read) |
 
 Layer-owned files (under `squad/`) are portable across projects; run
 artifacts (under `docs/squad/`) belong to the project that spent the
