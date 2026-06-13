@@ -187,7 +187,10 @@ records what it really cost.
    sub-`ship` judgment → cross-validate; `ship` judgment → escalate or
    decline). Under `gate=auto` routine gates proceed unattended but the
    strategic floor (`sensitive` data, `ship` stakes, over-cap) still
-   pauses; a `check=<name>` is validated for independence + verifier
+   pauses; the explicit-only `gate=auto-unsafe` removes those pauses too
+   for a trusted pipeline, keeping the absolute invariants (verify still
+   runs, FAIL never integrates, BLOCKED data still blocks, the hard cap
+   still stops). A `check=<name>` is validated for independence + verifier
    rating or it falls back to the in-house ladder.
 2. [`squad-route`](squad-route/) filters the roster: rating clears the
    stakes bar, data-handling covers the inputs, status allows the work.

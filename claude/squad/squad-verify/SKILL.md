@@ -1,6 +1,6 @@
 ---
 name: squad-verify
-description: The acceptance gate between a squad member's output and the repo (Gate 3) — audit the dispatch return against the acceptance criteria fixed before routing, via a gate ladder (cheapest sufficient first) schema → deterministic results oracle → cross-validate (cross-vendor, signal-only) → in-house judgment, in requirement-audit PASS/PARTIAL/FAIL format with evidence per row; PASS integrates from the sandbox, PARTIAL integrates only with gaps explicitly accepted by the user, FAIL drives the escalation ladder (one retry with named gaps → next-ranked member → in-house) — and the outcome feeds the ledger and, when it contradicts ROSTER.md, a rating-feedback proposal (Gate 4). Use this skill whenever a dispatch return awaits judgment ("verify what came back", "is the squad output good", squad-lead step 5), and for scoring eval returns (eval-run phase 2 borrows this format). The required verifier power is set by the task class, not by choice: verifiable-output tasks (code/data/anything runnable) can be certified by a deterministic oracle even under a common lead (Situation 2); judgment-output tasks at ship stakes always need a powerful in-house judge. Cross-validation is a signal that escalates disagreement — never an integration decision (no member self-certifies into the repo or the State Ledger). Verify depth on the judgment rung scales with the member's rating: A verify-light (spot checks), B/C full. Honors the gate mode (human default / auto — auto integrates a PASS and runs the escalation ladder unattended, but a ship-stakes PARTIAL/FAIL always pauses) and the check flag (default in-house ladder, or a registered third-party check slotted in at the rung its power + independence earn, backstopped by in-house — a custom check fills a rung, never raises a generator's ceiling, never self-certifies). A self-reported confidence may only deepen verify, never lighten it. Pairs with squad-dispatch (upstream record + quarantined sandbox), squad-route (the next-ranked fallback + cross-validation peers), requirement-audit (the row format), squad-plan (the per-node gate kind), and ROSTER.md (rating feedback).
+description: The acceptance gate between a squad member's output and the repo (Gate 3) — audit the dispatch return against the acceptance criteria fixed before routing, via a gate ladder (cheapest sufficient first) schema → deterministic results oracle → cross-validate (cross-vendor, signal-only) → in-house judgment, in requirement-audit PASS/PARTIAL/FAIL format with evidence per row; PASS integrates from the sandbox, PARTIAL integrates only with gaps explicitly accepted by the user, FAIL drives the escalation ladder (one retry with named gaps → next-ranked member → in-house) — and the outcome feeds the ledger and, when it contradicts ROSTER.md, a rating-feedback proposal (Gate 4). Use this skill whenever a dispatch return awaits judgment ("verify what came back", "is the squad output good", squad-lead step 5), and for scoring eval returns (eval-run phase 2 borrows this format). The required verifier power is set by the task class, not by choice: verifiable-output tasks (code/data/anything runnable) can be certified by a deterministic oracle even under a common lead (Situation 2); judgment-output tasks at ship stakes always need a powerful in-house judge. Cross-validation is a signal that escalates disagreement — never an integration decision (no member self-certifies into the repo or the State Ledger). Verify depth on the judgment rung scales with the member's rating: A verify-light (spot checks), B/C full. Honors the gate mode (human default / auto / auto-unsafe — auto integrates a PASS and runs the escalation ladder unattended but pauses on a ship-stakes PARTIAL/FAIL; the explicit auto-unsafe removes that pause too, yet no mode ever skips the gate ladder or integrates a FAIL) and the check flag (default in-house ladder, or a registered third-party check slotted in at the rung its power + independence earn, backstopped by in-house — a custom check fills a rung, never raises a generator's ceiling, never self-certifies). A self-reported confidence may only deepen verify, never lighten it. Pairs with squad-dispatch (upstream record + quarantined sandbox), squad-route (the next-ranked fallback + cross-validation peers), requirement-audit (the row format), squad-plan (the per-node gate kind), and ROSTER.md (rating feedback).
 ---
 
 # Squad Verify
@@ -88,8 +88,13 @@ The `gate` mode sets how Gate 3 closes: `human` asks on PARTIAL and on
 `ship`-stakes FAIL; `auto` integrates a PASS and applies the escalation
 ladder unattended, but **the strategic floor still pauses** — a
 PARTIAL/FAIL at `ship` stakes always surfaces to a human even under
-`auto`. Auto changes who clicks approve, never whether the gate ladder
-runs.
+`auto`. `auto-unsafe` (explicit token only) removes that pause too: a
+`ship`-stakes **PARTIAL auto-integrates with its gaps recorded**, and a
+`ship`-stakes **FAIL runs the escalation ladder unattended** to in-house.
+But the mode never touches the absolute invariants — **the gate ladder
+still runs in full, and a FAIL never integrates** (it escalates; it is
+never merged). No `gate` value changes *whether* verification happens,
+only *who (if anyone) is asked to approve* the result.
 
 The mode decides whether the in-house judgment rung is freely available
 (`powerful` — yes, it is the default verifier) or constrained (`common`
@@ -262,8 +267,11 @@ settles on `schema`/`deterministic`/`cross-validate` alone).
   *ignored*. An external verifier that can't run is a verifier that
   didn't verify.
 - **`auto` past the ship floor.** `gate=auto` integrates a PASS
-  unattended; it does **not** auto-ship a PARTIAL/FAIL at `ship` stakes.
-  That row always surfaces to a human, flag or no flag.
+  unattended; it does **not** auto-ship a PARTIAL at `ship` stakes — that
+  pause is removed only by the explicit `gate=auto-unsafe`. And no mode,
+  `auto-unsafe` included, ever integrates a **FAIL**: a FAIL escalates,
+  never merges. Crossing the ship floor on plain `auto`, or merging a
+  FAIL under any flag, is the floor or the invariant being ignored.
 - **Swallowing the outcome.** A verify that doesn't land in the ledger
   and the rolling record leaves routing exactly as smart as before.
 

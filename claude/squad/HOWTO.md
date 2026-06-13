@@ -127,8 +127,8 @@ Two more caller flags, same shape as `lead` — omit either for its safe
 default:
 
 ```
-gate  = human | auto        # human (default): gates ask. auto: gates run unattended.
-check = default | <name>    # default (in-house ladder), or your own registered check.
+gate  = human | auto | auto-unsafe   # human (default): gates ask. auto: tactical gates run unattended. auto-unsafe: strategic floor too (explicit only).
+check = default | <name>             # default (in-house ladder), or your own registered check.
 ```
 
 ```
@@ -142,9 +142,19 @@ check = default | <name>    # default (in-house ladder), or your own registered 
   (eval specs, routine sub-`ship` routes under cap, PASS integrations,
   demotions). It **never** removes it on the **strategic floor**:
   clearing what data may leave in-house, `sensitive`/`ship`/over-cap
-  routes, shipping a PARTIAL/FAIL at `ship`, or promoting to A always
-  pause for you. Auto is unattended bulk throughput, not a blank cheque —
-  and every auto decision is still written to the records.
+  routes, shipping a PARTIAL at `ship`, or promoting to A always pause for
+  you. Auto is unattended bulk throughput, not a blank cheque — and every
+  auto decision is still written to the records.
+- **`gate=auto-unsafe`** is the explicit opt-in for a trusted,
+  pre-cleared, pre-budgeted pipeline that wants *no* human in the loop —
+  it removes the strategic-floor pauses too (`ship` routes, `ship`
+  PARTIAL integrations, promotions). You must type the literal
+  `gate=auto-unsafe`; "run it unattended" gets you plain `auto`, never
+  this. Even here the **absolute invariants** hold: verification still
+  runs, a FAIL never integrates, a BLOCKED data class still blocks (it
+  never auto-clears data to a vendor), the hard budget cap still stops the
+  run, and everything is logged and flagged `auto-unsafe`. If you can't
+  say why the pipeline is trusted enough, you want `auto`.
 - **`check=<name>`** points the verifier at a registered check (an
   oracle, an open-source checker, another vendor's review agent) instead
   of the in-house ladder. It must be **a different vendor than the

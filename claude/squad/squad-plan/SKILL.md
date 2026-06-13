@@ -146,7 +146,11 @@ breaker trips**:
 execution pauses, the user gets the state summary (verified entries,
 remaining nodes, spend) and chooses — raise the cap, simplify the
 remaining plan, or take the rest in-house. Hitting the breaker is a
-finding for the playbook, not a failure.
+finding for the playbook, not a failure. Under **`gate=auto-unsafe`** the
+80% breaker *pause* is removed (the job runs on to the cap unattended),
+but the **hard cap at 100% still stops** execution — `auto-unsafe` runs
+freely up to the authorized ceiling, never past it; raising the ceiling
+is always an explicit human act.
 
 ### Phase 4 — Record, gate, open
 
@@ -159,9 +163,17 @@ explicit approval before node 1 dispatches. Under **`gate=auto`** the
 plan auto-proceeds *below the strategic floor* (recorded, not silent);
 the floor — over-budget, `sensitive` data, `ship` stakes — still pauses
 for a human, and during the DAG walk a `ship`-stakes PARTIAL/FAIL still
-surfaces even unattended. A plan that fails the Situation-2 guard (a
+surfaces even unattended. Under **`gate=auto-unsafe`** (explicit token
+only) the plan auto-proceeds through the strategic floor too —
+`ship`-stakes and `sensitive`-data nodes dispatch without a pause —
+*except* the absolute invariants: a node whose member can't be cleared
+for its data still can't run (BLOCKED blocks), every node's gate ladder
+still runs, a node FAIL still escalates rather than merges, and the
+**hard cap still stops** the job (only the 80% breaker *pause* is removed
+— see Phase 3). A plan that fails the Situation-2 guard (a
 `common`-verifier job with an unguarded frontier judgment node) does
-**not** reach Gate 2 — fix the gate or the posture first.
+**not** reach Gate 2 under any `gate` value — fix the gate or the posture
+first.
 
 ### Phase 5 — Hand off to the loop
 

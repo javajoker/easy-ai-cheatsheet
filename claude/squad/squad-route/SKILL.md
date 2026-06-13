@@ -1,6 +1,6 @@
 ---
 name: squad-route
-description: Pick who executes a task — the cheapest squad member whose measured rating clears the stakes bar, whose data-handling clearance covers the inputs, and whose status allows the work; in-house (Claude) when nobody clears. Reads ROSTER.md and the member sheets at runtime (never hardcodes members), applies the eligibility filter, orders eligible members by cost band, and surfaces a routing decision record: chosen member, why, estimated cost, fallback. Honors Gate 2 and the gate mode — under gate=human ask above the budget threshold; under gate=auto proceed unattended below the strategic floor (sensitive data, ship stakes, over-cap always pause regardless). Validates a check=<name> for independence (different vendor than the chosen member) and a verifier rating, falling back to the in-house ladder otherwise. Use this skill when the user says "who should do this", "route this", "can this go to a cheaper model", "pick a squad member for X", or as the squad-lead agent's step 2 after classification. Requires the task to be classified first (task class, stakes, data sensitivity, acceptance criteria fixed). Pairs with squad-dispatch (executes the decision), squad-verify (the criteria the decision will be judged by), eval-design/eval-run (when an unrated pair blocks a route worth unblocking), and ROSTER.md (the single source of routing truth).
+description: Pick who executes a task — the cheapest squad member whose measured rating clears the stakes bar, whose data-handling clearance covers the inputs, and whose status allows the work; in-house (Claude) when nobody clears. Reads ROSTER.md and the member sheets at runtime (never hardcodes members), applies the eligibility filter, orders eligible members by cost band, and surfaces a routing decision record: chosen member, why, estimated cost, fallback. Honors Gate 2 and the gate mode — under gate=human ask above the budget threshold; under gate=auto proceed unattended below the strategic floor (sensitive data, ship stakes, over-cap pause under auto); the explicit gate=auto-unsafe crosses those pauses too but still cannot send to a BLOCKED data class or exceed the hard cap. Validates a check=<name> for independence (different vendor than the chosen member) and a verifier rating, falling back to the in-house ladder otherwise. Use this skill when the user says "who should do this", "route this", "can this go to a cheaper model", "pick a squad member for X", or as the squad-lead agent's step 2 after classification. Requires the task to be classified first (task class, stakes, data sensitivity, acceptance criteria fixed). Pairs with squad-dispatch (executes the decision), squad-verify (the criteria the decision will be judged by), eval-design/eval-run (when an unrated pair blocks a route worth unblocking), and ROSTER.md (the single source of routing truth).
 ---
 
 # Squad Route
@@ -122,6 +122,15 @@ Then the gate, modulated by the `gate` mode:
   (recording the decision); the floor — over-cap cost, `ship` stakes, or
   `sensitive` data — **still pauses for a human**, exactly as in `human`
   mode. Auto removes the click on routine routes, never on the floor.
+- **`gate=auto-unsafe`:** proceed unattended through `ship` stakes and
+  `sensitive` data **too** (recorded, flagged `auto-unsafe`) — *but
+  within the two hard limits a route cannot cross even here*: a member
+  whose `data_handling` does **not** already clear the inputs is still
+  ineligible (BLOCKED blocks — `auto-unsafe` never auto-writes a
+  clearance), and an estimate **over the hard cap** still stops (not
+  pauses — re-plan or raise the cap explicitly). `auto-unsafe` removes
+  the high-stakes click; it does not widen the data boundary or the spend
+  ceiling.
 
 If the route failed only because a pair is **U**, say which eval
 (Scenario W) would unlock it — that note is how the roster grows where

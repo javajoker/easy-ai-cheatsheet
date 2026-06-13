@@ -103,8 +103,8 @@ Resolved in the same breath as `lead`, recorded in the same places
 unset.
 
 ```
-gate  = human | auto        # DEFAULT human — auto runs the tactical gates unattended; strategic floors still pause
-check = default | <name>    # DEFAULT default — or a registered third-party check (a member in the verifier role)
+gate  = human | auto | auto-unsafe   # DEFAULT human — auto runs tactical gates unattended; auto-unsafe removes the strategic-floor pauses too (explicit only)
+check = default | <name>             # DEFAULT default — or a registered third-party check (a member in the verifier role)
 ```
 
 - **`gate`** switches the five gates between human approval (default) and
@@ -116,6 +116,21 @@ check = default | <name>    # DEFAULT default — or a registered third-party ch
   unlogged: every auto decision still lands in the records. When the
   caller asks for `auto` on work that hits a strategic floor, honor the
   floor and say which gate paused and why.
+  - **`auto-unsafe`** is the deliberate, explicit opt-in that removes the
+    strategic-floor *pauses* too (for a trusted, pre-authorized pipeline).
+    **Resolve it only from the literal `gate=auto-unsafe` token or an
+    unmistakable explicit risk-acceptance** — never from "run it
+    unattended" or any vague phrasing (that is `auto`); when in doubt,
+    drop to `auto` and say so. Even under `auto-unsafe` the **absolute
+    invariants** hold and you enforce them: the gate ladder still runs, a
+    FAIL never integrates (a `ship` PARTIAL may auto-merge with gaps
+    recorded; a FAIL escalates unattended to in-house), **no new data
+    clearance is auto-written** (a BLOCKED class still blocks — irreversible
+    third-party exposure is never unattended), the **hard budget cap still
+    stops** execution (only the 80% breaker *pause* is removed), and every
+    self-made decision is logged loudly and flagged `auto-unsafe`. If you
+    cannot see why the pipeline is trusted enough, decline `auto-unsafe`
+    and run `auto`.
 - **`check`** selects the verifier: the in-house ladder (default) or a
   registered check skill/agent. A plugged-in check is governed by
   `squad-verify`'s verifier-power table and the **independence** rule
@@ -258,9 +273,16 @@ oracle suffices; judgment-at-stakes → powerful judge required). See
   accounting error. Report all-in vs. baseline.
 - **`auto` over the strategic floor.** `gate=auto` automates the tactical
   tier, not the strategic one. Auto-clearing data-handling, auto-shipping
-  a PARTIAL, auto-promoting to A, or auto-spending past the cap because
-  "the caller said auto" is the floor being ignored — pause and say which
-  gate held.
+  a PARTIAL, auto-promoting to A, or auto-spending past the cap under
+  plain `auto` because "the caller said auto" is the floor being ignored —
+  pause and say which gate held. Crossing the floor unattended is *only*
+  `auto-unsafe`, and only from its explicit token.
+- **`auto-unsafe` by inference, or as a verify-skip.** Never resolve
+  `auto-unsafe` from vague phrasing — it is explicit-token only. And it
+  removes human *pauses*, not the machine's *checks*: the gate ladder
+  still runs, FAIL never integrates, BLOCKED data still blocks, the hard
+  cap still stops. An `auto-unsafe` run that skipped verification or
+  shipped a FAIL is a bug, not the mode working.
 - **Trusting an unvetted custom check.** A `check=<name>` that is unrated,
   or shares the generator's vendor, is not a verifier — it's self-grading
   by proxy. Refuse it and fall back to the in-house ladder.

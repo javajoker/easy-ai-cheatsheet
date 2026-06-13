@@ -47,6 +47,20 @@ record is written — `auto` is unattended, not unlogged.
 | **3 — Integration** | `squad-verify`, after dispatch | Nothing integrates (and no delta merges into the State Ledger) without a PASS. PARTIAL integrates only with gaps explicitly accepted. Quarantined deltas are readable/editable before the decision — the Glass Box. | Always enforced; PASS integrates, PARTIAL asks. | PASS integrates; **PARTIAL/FAIL at `ship` stakes always pauses**. |
 | **4 — Roster movement** | `eval-run` / rating feedback | Any rating or status change, as a diff preview (the `skill-merge` discipline). | Always ask. | Demotions auto-apply (recorded); **promotion to A always pauses**. |
 
+**`gate=auto-unsafe`** (explicit token only — never inferred) removes the
+strategic-floor *pauses* in the last column too: under it, `ship`-stakes
+routes, `ship`-stakes PARTIAL integrations, and promotions to A proceed
+unattended. It does **not** remove the **absolute invariants**, which are
+not approvals: the gate ladder still runs (verification never skips), a
+FAIL never integrates (it escalates unattended to in-house), **no new
+`data_handling` clearance is auto-written** (a BLOCKED class still blocks
+— the data boundary is never crossed unattended), the hard budget cap
+still stops execution (only the 80% breaker *pause* is gone), and every
+self-made decision is logged and flagged `auto-unsafe`. These are not
+pauses but hard limits — `auto-unsafe` removes the human *clicks*, not
+the machine's *checks*. Use it
+only for a trusted, pre-cleared, pre-budgeted pipeline.
+
 ## Phase by phase
 
 ### Phase 1 — Onboard (`member-onboard`)

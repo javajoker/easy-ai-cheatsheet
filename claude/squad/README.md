@@ -196,16 +196,19 @@ other — a brilliant member with no clearance for the data stays
 in-house, and a cleared member with a U rating takes nothing that
 matters.
 
-## The `gate` flag — auto or human approval
+## The `gate` flag — human, auto, or auto-unsafe
 
 The five gates pause for a human by default. The **`gate` flag** lets the
-caller run them unattended — but only along the line the governance tiers
-already draw: **`auto` automates the *tactical* tier; the *strategic*
-tier always pauses, regardless of the flag.**
+caller run them unattended — by default still along the line the
+governance tiers draw (**`auto` automates the *tactical* tier; the
+*strategic* tier still pauses**), or, with an explicit and deliberately
+ugly third value, all the way (**`auto-unsafe` removes the strategic-floor
+*pauses* too**, keeping only a hard set of non-negotiable invariants).
 
 ```
-gate = human   # DEFAULT — every gate pauses for approval as documented
-gate = auto    # tactical gates auto-proceed (recorded, not silent); strategic floors still pause
+gate = human         # DEFAULT — every gate pauses for approval as documented
+gate = auto          # tactical gates auto-proceed (recorded, not silent); strategic floor still pauses
+gate = auto-unsafe   # OPT-IN, explicit only — strategic-floor pauses removed too; absolute invariants remain
 ```
 
 Set it like `lead` — a flag (`gate=auto`) or plain language ("run it
@@ -213,7 +216,10 @@ unattended", "auto-approve the gates"). `squad-lead` resolves it, records
 it (`gate-mode:` in the routing decision / plan header — named to avoid
 colliding with a node's `gate` *rung*), and each gate honors it. **Unset
 means `human`** — the safe default; the lead never goes unattended on its
-own.
+own. **Plain language never reaches `auto-unsafe`** — "run it unattended"
+resolves to `auto`; the unsafe mode requires the literal `gate=auto-unsafe`
+token (or an unmistakable explicit acceptance of the risk), so it can
+never be entered by accident or by a vague instruction.
 
 What `auto` may decide on its own (tactical): the eval spec (Gate 1), a
 sub-`ship` route under the budget cap (Gate 2), a PASS integration
@@ -232,6 +238,47 @@ So `gate=auto` buys unattended bulk throughput without ever letting the
 machine self-grant trust, spend past its cap, or send data a human hasn't
 cleared. Everything `auto` decides is still written to the same records —
 auto is *unattended*, never *unlogged*.
+
+### `gate=auto-unsafe` — for a trusted, pre-authorized pipeline
+
+A trusted internal pipeline whose members are already cleared and whose
+budget is already set may want to run *fully* unattended — through
+`ship`-stakes routes, PARTIAL integrations, and roster promotions — with
+no human in the loop at all. `gate=auto-unsafe` is that mode. It removes
+the strategic-floor **pauses** the table above lists. It does **not**
+remove safety — because the floor mixed two different things, and only
+one of them is an "ask a human to proceed" decision. `auto-unsafe`
+proceeds on the proceed-decisions; it preserves the **absolute
+invariants**, which are not approvals but correctness and boundary
+mechanisms no approval mode may touch:
+
+1. **The gate ladder always runs.** `auto-unsafe` is *no human pause*, not
+   *no verification*. Every output is still verified; a verdict is always
+   computed. It changes who (if anyone) clicks approve — never whether the
+   check happens.
+2. **FAIL never integrates.** A `ship`-stakes PARTIAL may auto-integrate
+   with its gaps recorded; a FAIL still runs the escalation ladder
+   (unattended) and lands in-house. `auto-unsafe` cannot turn a FAIL into
+   a merge.
+3. **No new data clearance is auto-written.** It operates strictly within
+   the `data_handling` clearances already on the sheets. Sending a data
+   class to a third-party vendor is irreversible — that boundary is never
+   crossed unattended, even here. A BLOCKED clearance still blocks.
+4. **The hard budget cap still stops.** The 80% breaker *pause* is gone,
+   but execution still halts at 100% of the authorized cap. `auto-unsafe`
+   runs freely *up to* the ceiling the human set; it never raises the
+   ceiling itself.
+5. **No self-grading, ever, and everything is logged.** Independence of
+   verifier from generator still holds; no member or check self-certifies;
+   and every decision `auto-unsafe` makes on its own is written loudly to
+   the records, flagged as auto-unsafe.
+
+In short: `auto` removes the *routine* clicks; `auto-unsafe` removes the
+*high-stakes* clicks too, for a caller who has accepted that risk in
+advance — but neither removes verification, the FAIL bar, the data
+boundary, the spend ceiling, or the audit trail. "Unsafe" means
+*un-gated by a human*, not *un-checked by the machine*. If you can't name
+why your pipeline is trusted enough for it, you want `auto`.
 
 ## The `check` flag — the default verifier or a plugged-in one
 
