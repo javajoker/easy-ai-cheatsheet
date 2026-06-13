@@ -6,6 +6,7 @@ interface: cli
 status: probation
 cost_band: mid
 data_handling: BLOCKED
+roles: [generator]                # rate it as a verifier before using it as a check=<name>
 evaluated: []
 member_version: UNVERIFIED — run `codex --version` at onboarding and record it
 ---

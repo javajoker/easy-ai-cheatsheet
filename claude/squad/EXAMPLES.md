@@ -1,13 +1,15 @@
 # EXAMPLES — worked squad runs
 
-Five worked examples showing the artifacts at each step. Names, scores,
+Six worked examples showing the artifacts at each step. Names, scores,
 and costs below are **illustrative** — your evals produce your numbers.
 Example 1 walks Scenario W (evaluation), Example 2 walks Scenario X
 (routed execution), Example 3 shows the escalation ladder and rating
 feedback doing their jobs, Example 4 walks Scenario Z (a multi-member
-DAG job with a shared State Ledger), and Example 5 shows Situation 2 —
+DAG job with a shared State Ledger), Example 5 shows Situation 2 —
 a common (cheap) lead safely commanding powerful members via a results
-oracle and a cross-validate gate.
+oracle and a cross-validate gate — and Example 6 shows the operating
+flags: an unattended `gate=auto-unsafe` run verified by a pluggable
+`check`, with the absolute invariants holding.
 
 ---
 
@@ -81,9 +83,14 @@ intact, code blocks byte-identical, no truncation.
 
 ```markdown
 # Routing decision — 2026-06-13-manual-zhtw
+lead: powerful · gate-mode: human · check: default   # caller set no flags ⇒ all defaults
+task class / stakes / data: translation / internal / internal
 eligible: gemini-cli (B, low band, cleared: internal)
 excluded: ollama-local (C — stakes bar is B for internal)
 chosen:   gemini-cli · estimated cost: low band × 14 files
+all-in:   low×14 + orchestration tax + in-house verify
+baseline: premium × 14 files in-house — higher, so the route wins
+gate-rung: in-house judgment (sampled — see verify)
 fallback: in-house (Claude)
 → under budget threshold: auto-proceed (Gate 2)
 ```
@@ -108,12 +115,14 @@ Verdict: PASS with noted fix · integrate (Gate 3)
 **Step 5 — ledger.** `docs/squad/ledger.md` gains:
 
 ```markdown
-| 2026-06-13 | translation | gemini-cli | est: low×14 | actual: low×14 + in-house verify | PASS (1 fix) | escalations: 0 |
+| 2026-06-13 | translation | gemini-cli | est: low×14 | all-in: low×14 + tax + verify | baseline: premium×14 (higher) | PASS (1 fix) | escalations: 0 |
 ```
 
 **Outcome.** Premium tokens were spent on classification, routing, and
 verification only; generation ran in the low band. The two-line fix cost
-less than re-doing one file in-house.
+less than re-doing one file in-house. The ledger's **all-in vs. baseline**
+pair records the win explicitly: low-band generation + tax + verify came
+in under premium-everything in-house.
 
 ---
 
@@ -162,7 +171,7 @@ scenario — see [`references/`](references/README.md).)
 
 ```markdown
 # Job plan — 2026-06-13-q3-trends
-lead: powerful            # caller set no flag ⇒ Situation 1 default
+lead: powerful · gate-mode: human · check: default   # caller set no flags ⇒ all defaults
 objective: Extract Q3 revenue metrics from the 50-pg report and graph the trend.
 budget: mid band, breaker at 80%
 
@@ -217,7 +226,7 @@ dip is visible and labeled, approves.
 **Step 7 — close.** Job ledger reconciled into `docs/squad/ledger.md`:
 
 ```markdown
-| 2026-06-13 | job:q3-trends | n1 gemini-cli ×5 / n2 codex-cli ×2 | est: mid | actual: low×5 + mid×2 + in-house n3 | PASS | escalations: 1 (n2 gate) |
+| 2026-06-13 | job:q3-trends | n1 gemini-cli ×5 / n2 codex-cli ×2 | est: mid | all-in: low×5 + mid×2 + tax + in-house n3 | baseline: premium end-to-end (higher) | PASS | escalations: 1 (n2 gate) |
 ```
 
 Budget never hit the breaker. The plan shape distills to
@@ -245,7 +254,7 @@ members' output? Two job nodes, two answers.
 
 ```markdown
 # Job plan — 2026-06-13-api-client
-lead: common              # from the caller's flag — the Situation-2 guard is active
+lead: common · gate-mode: human · check: default   # lead from the caller's flag; gate/check defaulted
 budget: mid band, breaker at 80%
 
 | node | kit | tier | output | gate | guard check |
@@ -295,6 +304,54 @@ nodes — because neither relied on the lead's judgment: n1's oracle and
 n2's cross-vendor filter (with an oracle tie-break) carried the
 decisions. The configuration the framework *blocks* — a weak lead
 rubber-stamping frontier prose at ship stakes — never got past planning.
+
+---
+
+## Example 6 — Unattended run: `gate=auto-unsafe` + a pluggable check
+
+**Setup.** A nightly job converts incoming config files (YAML → TOML) — a
+trusted, pre-cleared, pre-budgeted pipeline the team runs with no one
+watching. The caller sets two flags explicitly:
+
+> Squad the nightly config conversion — `gate=auto-unsafe`, `check=toml-lint`.
+
+`toml-lint` is a registered **check**: a deterministic OSS validator
+(parses the TOML, checks it against the schema), rated as a verifier and
+vendor-independent of the generator. `gate=auto-unsafe` is the literal
+token — plain "run it unattended" would have resolved to `auto`, which
+pauses the strategic floor; the caller typed the unsafe token to mean it.
+
+**Routing (auto-unsafe, recorded).** 40 input files; file 19 is
+**near-identical to file 7** (`squad-plan` dedup) → collapsed to one
+dispatch, the verified result fanned to both — **39 unique dispatches**.
+All 39 route to `ollama-local` (free band, B on `kit-yaml-toml`) and
+dispatch **unattended** — no human click, every decision logged and
+flagged `auto-unsafe`. One file carries an API key (`sensitive`):
+ollama-local is cleared for it (local, sensitive-cleared), so it routes —
+**but had the only eligible member been an uncleared vendor, auto-unsafe
+would still have blocked it.** The data boundary is the invariant
+auto-unsafe never crosses.
+
+**Verify (the pluggable check as the deterministic rung).** Each return
+runs through `toml-lint` in the sandbox — the check *is* the deterministic
+results-oracle rung. 38 PASS and auto-integrate. One return FAILs the lint
+(malformed table). **Even under auto-unsafe the FAIL does not integrate**
+— it runs the escalation ladder unattended: one retry to ollama-local with
+the lint error → still FAIL → next-ranked `gemini-cli` → PASS. The bad
+output never reached the repo; no human was paused; the invariant held.
+
+**Ledger (all-in vs. baseline, flagged).**
+
+```markdown
+| 2026-06-13 | bulk-transform | ollama-local ×39 / gemini-cli ×1 (escalated) | est: free | all-in: free×39 + low×1 + tax + lint-check | baseline: premium×40 (higher) | PASS 39/39→40 files (gate=auto-unsafe) | escalations: 1 |
+```
+
+**Outcome.** A fully unattended run shipped every file with no human in
+the loop — yet verification still ran on each (via the plugged-in check),
+a FAIL still escalated instead of merging, the data boundary still held,
+and the run stayed under the hard cap. `auto-unsafe` removed the *clicks*,
+not the *checks*. Contrast Example 2 (default `gate=human`, `check=default`):
+same control plane, different who-approves.
 
 ---
 

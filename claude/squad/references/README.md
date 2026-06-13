@@ -14,6 +14,16 @@ attached verbatim (user-provided, 2026-06):
   deltas, DAG configuration contract, Glass Box interception, the
   Auditor circuit breaker, the AEI routing index.
 
+And one **critique-response** document (this layer's reply to a 2026-06
+external review):
+
+- [`04-review-response.md`](04-review-response.md) — each challenge and
+  suggestion the review raised, the verdict (already covered / partial →
+  strengthened / newly adopted), and the exact file each change lives in.
+  Read it to see *why* the orchestration-tax accounting, the confidence
+  signal, result caching, creative-eval rubrics, and the two governance
+  tiers exist.
+
 ## Concept → implementation map
 
 How each reference concept landed in this layer — adopted, adapted, or

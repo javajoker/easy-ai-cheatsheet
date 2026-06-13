@@ -34,13 +34,32 @@ compounding tokens.
 
 ## The five gates
 
-| Gate | Where | What a human approves | Default |
-|---|---|---|---|
-| **0 — Membership** | `member-onboard`, before first invocation | The MEMBER.md draft: invocation contract, cost band, and especially the data-handling section (starts BLOCKED). | Always ask. |
-| **1 — Eval spec** | `eval-design`, before any eval spend | The golden task set + rubric (= the kit's acceptance criteria when a kit exists). Bad rubric = worthless ratings. | Always ask. |
-| **2 — Routing / plan** | `squad-route` per task; `squad-plan` per job | The routing decision (member, rationale, estimated cost, fallback) — or for jobs, the whole plan: verifier posture, nodes, tiers, gate kinds, budget, breaker. A plan failing the Situation-2 guard never reaches this gate. | Auto-proceed below the budget threshold in `ROSTER.md`; ask above it, ask always for sensitive data or `stakes: ship`. |
-| **3 — Integration** | `squad-verify`, after dispatch | Nothing integrates (and no delta merges into the State Ledger) without a PASS. PARTIAL integrates only with gaps explicitly accepted. Quarantined deltas are readable/editable before the decision — the Glass Box. | Always enforced; report always shown. |
-| **4 — Roster movement** | `eval-run` / rating feedback | Any rating or status change, as a diff preview (the `skill-merge` discipline). | Always ask. |
+The **`gate` flag** (`human` default / `auto`) sets the approval mode.
+`auto` automates the **tactical** tier; the **strategic floor** in the
+last column always pauses for a human even under `auto`. Either way, the
+record is written — `auto` is unattended, not unlogged.
+
+| Gate | Where | What a human approves | Under `gate=human` (default) | Under `gate=auto` (strategic floor still pauses) |
+|---|---|---|---|---|
+| **0 — Membership** | `member-onboard`, before first invocation | The MEMBER.md draft: invocation contract, cost band, and especially the data-handling section (starts BLOCKED). | Always ask. | Onboard auto; **clearing/widening data-handling always pauses**. |
+| **1 — Eval spec** | `eval-design`, before any eval spend | The golden task set + rubric (= the kit's acceptance criteria when a kit exists). Bad rubric = worthless ratings. | Always ask. | Auto-proceed (spec + cost recorded). |
+| **2 — Routing / plan** | `squad-route` per task; `squad-plan` per job | The routing decision (member, rationale, estimated cost, fallback) — or for jobs, the whole plan: verifier posture, nodes, tiers, gate kinds, budget, breaker. A plan failing the Situation-2 guard never reaches this gate. | Auto-proceed below the budget threshold in `ROSTER.md`; ask above it, ask always for sensitive data or `stakes: ship`. | Auto-proceed under cap; **`sensitive` data, `ship` stakes, or over-cap always pauses**. |
+| **3 — Integration** | `squad-verify`, after dispatch | Nothing integrates (and no delta merges into the State Ledger) without a PASS. PARTIAL integrates only with gaps explicitly accepted. Quarantined deltas are readable/editable before the decision — the Glass Box. | Always enforced; PASS integrates, PARTIAL asks. | PASS integrates; **PARTIAL/FAIL at `ship` stakes always pauses**. |
+| **4 — Roster movement** | `eval-run` / rating feedback | Any rating or status change, as a diff preview (the `skill-merge` discipline). | Always ask. | Demotions auto-apply (recorded); **promotion to A always pauses**. |
+
+**`gate=auto-unsafe`** (explicit token only — never inferred) removes the
+strategic-floor *pauses* in the last column too: under it, `ship`-stakes
+routes, `ship`-stakes PARTIAL integrations, and promotions to A proceed
+unattended. It does **not** remove the **absolute invariants**, which are
+not approvals: the gate ladder still runs (verification never skips), a
+FAIL never integrates (it escalates unattended to in-house), **no new
+`data_handling` clearance is auto-written** (a BLOCKED class still blocks
+— the data boundary is never crossed unattended), the hard budget cap
+still stops execution (only the 80% breaker *pause* is gone), and every
+self-made decision is logged and flagged `auto-unsafe`. These are not
+pauses but hard limits — `auto-unsafe` removes the human *clicks*, not
+the machine's *checks*. Use it
+only for a trusted, pre-cleared, pre-budgeted pipeline.
 
 ## Phase by phase
 
@@ -93,12 +112,15 @@ routing when present). The org disciplines:
 **In:** a task or a job. **Out:** integrated work + records + ledger
 entries.
 
-1. **Resolve `lead` mode + classify** (`squad-lead`). Read the caller's
-   `lead` flag (`powerful` default if unset — Situation 1; `common` for
-   Situation 2) and carry it as the verifier posture. Then: task
-   class/kit; stakes (`throwaway`/`internal`/`ship`); data sensitivity.
-   Acceptance criteria are fixed **now** (the kit's criteria, when one
-   exists) — criteria written after seeing output are not criteria.
+1. **Resolve the flags + classify** (`squad-lead`). Read the caller's
+   three flags, each defaulting to its safe value: `lead`
+   (`powerful` default — Situation 1; `common` for Situation 2, the
+   verifier posture), `gate` (`human` default — `auto`/`auto-unsafe` set
+   the approval mode), and `check` (`default` in-house ladder — or a
+   registered verifier). Then: task class/kit; stakes
+   (`throwaway`/`internal`/`ship`); data sensitivity. Acceptance criteria
+   are fixed **now** (the kit's criteria, when one exists) — criteria
+   written after seeing output are not criteria.
 2. **Plan — jobs only** (`squad-plan`). Multi-stage work becomes a DAG:
    nodes bind **kits + cost tiers** (never member names — members
    resolve at dispatch time, so a roster change re-routes the next node
@@ -131,8 +153,11 @@ entries.
 6. **Ledger.** Per dispatch: estimated vs. actual cost, outcome,
    escalations — into `docs/squad/ledger.md`; job ledgers reconcile on
    close. The ledger is the proof the layer pays for itself: the
-   number that matters is **cost per accepted task** (member + verify +
-   escalation overhead) vs. in-house.
+   number that matters is **all-in cost per accepted task** (member +
+   **orchestration tax** + verify + escalation overhead) vs. the
+   **`baseline`** in-house figure recorded beside it. That pair turns the
+   ledger into a running squad-vs-in-house benchmark — the layer keeps a
+   task class only while all-in < baseline.
 
 ### Phase 5 — Learn (rating feedback + `member-retune` + playbook)
 
@@ -166,6 +191,7 @@ which is exactly the pre-squad baseline.
 | Verification report | inside the dispatch record | `squad-verify` |
 | Cost ledger | `docs/squad/ledger.md` | `squad-dispatch` + `squad-verify` |
 | Playbook (reusable plans) | `docs/squad/playbook/<shape>.md` | `squad-plan` (Phase 5 distillation) |
+| Verified-result cache | `docs/squad/cache/` | `squad-state` (writes verified PASS deltas; `squad-plan` / `squad-dispatch` read) |
 
 Layer-owned files (under `squad/`) are portable across projects; run
 artifacts (under `docs/squad/`) belong to the project that spent the

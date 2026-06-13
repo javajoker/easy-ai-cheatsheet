@@ -39,7 +39,13 @@ legal:
 Record the inherited posture in the plan header (`lead: powerful|common`);
 it is the precondition the Phase-1 guard checks every node against. If
 the caller set no flag, the header reads `lead: powerful` — never leave
-it implicit.
+it implicit. Record the other two caller flags in the header too:
+**`gate-mode: human|auto`** (the approval mode for this job's gates —
+`human` if unset; named `gate-mode` to avoid colliding with each node's
+`gate` *rung*) and **`check: default|<name>`** (the verifier — in-house
+ladder if unset; a node may override with its own check). All three are
+explicit in the header so every dispatch record shows the regime it ran
+under.
 
 ### Phase 1 — Decompose into nodes
 
@@ -112,27 +118,62 @@ patterns not presets:
 - **Context isolation by design.** If a node "needs" most of the
   ledger, the decomposition is wrong — split or merge nodes until each
   reads narrowly.
+- **Dedup before fan-out.** In a bulk fan-out (40 configs, 14 docs),
+  collapse **identical-after-normalization** inputs to one dispatch and
+  fan the verified result back across the duplicates — don't pay per
+  copy. Near-duplicates that differ only in a parameter are a single
+  kit call with that parameter in the payload, not N calls.
+- **Reuse verified results (the result cache).** Before dispatching a
+  node, check `squad-state`'s verified-result cache for an identical
+  kit + payload that already PASSed; a hit reuses the verified delta for
+  free. This is the result-level twin of `docs/squad/playbook/` (which
+  caches plan *shapes*). The caveats are load-bearing: **only verified
+  results cache**, a hit still respects the input's **data class**, and a
+  cache entry inherits the `(stale)` discipline when its kit re-derives.
 
 ### Phase 3 — Budget and breaker
 
 Set the **job budget** from the routing estimates of all nodes plus
-expected escalation overhead. The ledger tracks `spent_so_far`; at
-**80% of cap without the end in sight, the circuit breaker trips**:
+expected escalation overhead **plus the orchestration tax** — the lead's
+own planning, per-node routing, and verification tokens, which on a small
+job can rival the member spend. Record the job's **baseline** too (what
+in-house would cost end to end): a job whose all-in (members + tax +
+verify) can't beat baseline should not be planned — say so and hand it
+back to in-house. That guard is the answer to the orchestration-tax
+critique: the tax is budgeted, not hidden. The ledger tracks
+`spent_so_far`; at **80% of cap without the end in sight, the circuit
+breaker trips**:
 execution pauses, the user gets the state summary (verified entries,
 remaining nodes, spend) and chooses — raise the cap, simplify the
 remaining plan, or take the rest in-house. Hitting the breaker is a
-finding for the playbook, not a failure.
+finding for the playbook, not a failure. Under **`gate=auto-unsafe`** the
+80% breaker *pause* is removed (the job runs on to the cap unattended),
+but the **hard cap at 100% still stops** execution — `auto-unsafe` runs
+freely up to the authorized ceiling, never past it; raising the ceiling
+is always an explicit human act.
 
 ### Phase 4 — Record, gate, open
 
 Write `docs/squad/jobs/<job-id>/plan.md` — the **verifier posture**, the
-node table (with each node's tier + gate kind), the DAG (Mermaid), and
-the budget — and open the ledger via `squad-state`. **Gate 2 applies to
-the plan as a whole**: jobs above the budget threshold, touching
-sensitive data, or at `ship` stakes get explicit approval before node 1
-dispatches. A plan that fails the Situation-2 guard (a `common`-verifier
-job with an unguarded frontier judgment node) does **not** reach Gate 2
-— fix the gate or the posture first.
+**gate mode + check**, the node table (with each node's tier + gate
+kind), the DAG (Mermaid), and the budget — and open the ledger via
+`squad-state`. **Gate 2 applies to the plan as a whole**: jobs above the
+budget threshold, touching sensitive data, or at `ship` stakes get
+explicit approval before node 1 dispatches. Under **`gate=auto`** the
+plan auto-proceeds *below the strategic floor* (recorded, not silent);
+the floor — over-budget, `sensitive` data, `ship` stakes — still pauses
+for a human, and during the DAG walk a `ship`-stakes PARTIAL/FAIL still
+surfaces even unattended. Under **`gate=auto-unsafe`** (explicit token
+only) the plan auto-proceeds through the strategic floor too —
+`ship`-stakes and `sensitive`-data nodes dispatch without a pause —
+*except* the absolute invariants: a node whose member can't be cleared
+for its data still can't run (BLOCKED blocks), every node's gate ladder
+still runs, a node FAIL still escalates rather than merges, and the
+**hard cap still stops** the job (only the 80% breaker *pause* is removed
+— see Phase 3). A plan that fails the Situation-2 guard (a
+`common`-verifier job with an unguarded frontier judgment node) does
+**not** reach Gate 2 under any `gate` value — fix the gate or the posture
+first.
 
 ### Phase 5 — Hand off to the loop
 
@@ -166,6 +207,10 @@ recurring, distill the plan (with actuals) into
 - **Breaker top-ups by reflex.** The breaker pauses *to ask a human a
   real question*. "Raise it and continue" without reading the state
   summary defeats it.
+- **Tax-blind budgeting.** A plan whose budget counts only member spend
+  hides the orchestration tax and the verify cost — the very costs that
+  can make a squad job lose to in-house. Budget all-in; compare to
+  baseline; decline when it can't win.
 - **Re-planning on node failure.** Node failures are the ladder's job.
   Re-plan only when the *decomposition* proved wrong (a node's contract
   was unfulfillable), and say so in the plan's history.

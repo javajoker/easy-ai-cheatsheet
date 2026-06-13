@@ -6,6 +6,7 @@ interface: cli
 status: home
 cost_band: premium
 data_handling: "cleared: sensitive"   # it's the home product — already trusted with the repo
+roles: [generator, verifier]           # the default verifier + executor of last resort
 evaluated: []                          # home is the baseline; it is not eval-rated
 member_version: current session model (see environment)
 ---

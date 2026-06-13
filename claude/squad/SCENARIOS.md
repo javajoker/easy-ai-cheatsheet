@@ -122,6 +122,22 @@ agent/skill discipline?"*
 | `requirement-audit` | shipped (share) | The underlying audit row format. |
 | `memory-ontology` | shipped (share) | Records a multi-session eval pass so it resumes. |
 
+### The calibration run (squad vs. baseline benchmark)
+
+A rating says a member *can* do the task; it doesn't prove routing it
+*pays*. To get that — the quantitative read the layer's whole premise
+rests on — run the eval as a **calibration run**: dispatch the golden set
+both ways, **to the member(s) and to in-house**, and report the four
+numbers per side — **cost, quality (PASS rate), latency, success rate** —
+with the member side counting its **all-in** cost (member + orchestration
+tax + verify + expected escalation), not just the band. The output is a
+small table in the scorecard: *squad all-in vs. in-house baseline* for
+this task class at this volume. That table is what justifies (or retires)
+the layer for the class — and it reuses the eval path entirely, so it
+costs one extra in-house pass, not a separate benchmark harness. Re-run
+it when a member version changes (Scenario Y) or the ledger's live
+baseline gap drifts from what calibration predicted.
+
 ### Manual fallback
 
 Write 5 representative prompts, run them through each member's CLI by
@@ -160,13 +176,22 @@ records what it really cost.
 ### Procedure
 
 1. Invoke the [`squad-lead`](squad-lead/AGENT.md) agent ("route this
-   through the squad" — optionally with `lead=common` to run Situation 2;
-   omit the flag for the `powerful` default). It resolves the `lead` mode
-   then **classifies**: task class, stakes
-   (`throwaway`/`internal`/`ship`), data sensitivity — and fixes the
-   acceptance criteria *before* routing. Under `lead=common` the
-   single-task Situation-2 guard applies (verifiable → oracle; sub-`ship`
-   judgment → cross-validate; `ship` judgment → escalate or decline).
+   through the squad"). Three optional flags, each defaulting to the safe
+   option when omitted: `lead=common` (Situation 2; default `powerful`),
+   `gate=auto` (unattended tactical gates; default `human`), and
+   `check=<name>` (a registered third-party verifier; default the
+   in-house ladder). It resolves all three, then **classifies**: task
+   class, stakes (`throwaway`/`internal`/`ship`), data sensitivity — and
+   fixes the acceptance criteria *before* routing. Under `lead=common`
+   the single-task Situation-2 guard applies (verifiable → oracle;
+   sub-`ship` judgment → cross-validate; `ship` judgment → escalate or
+   decline). Under `gate=auto` routine gates proceed unattended but the
+   strategic floor (`sensitive` data, `ship` stakes, over-cap) still
+   pauses; the explicit-only `gate=auto-unsafe` removes those pauses too
+   for a trusted pipeline, keeping the absolute invariants (verify still
+   runs, FAIL never integrates, BLOCKED data still blocks, the hard cap
+   still stops). A `check=<name>` is validated for independence + verifier
+   rating or it falls back to the in-house ladder.
 2. [`squad-route`](squad-route/) filters the roster: rating clears the
    stakes bar, data-handling covers the inputs, status allows the work.
    Cheapest eligible band wins. **Gate 2:** the decision (member, why,
@@ -295,8 +320,10 @@ target is won or lost.
 ### Procedure
 
 1. Invoke the [`squad-lead`](squad-lead/AGENT.md) agent (optionally with
-   `lead=common` / `situation=2`; omit for the `powerful` default). It
-   resolves the `lead` mode, then classifies and recognizes a *job*
+   `lead=common` / `situation=2`, and/or `gate=auto`|`auto-unsafe`,
+   and/or `check=<name>`; omit any for its safe default —
+   `powerful` / `human` / in-house ladder). It resolves all three flags
+   into the plan header, then classifies and recognizes a *job*
    (multi-stage), not a task.
 2. [`squad-plan`](squad-plan/) checks the playbook for a reusable plan,
    else inherits the **verifier posture** from the caller's `lead` flag

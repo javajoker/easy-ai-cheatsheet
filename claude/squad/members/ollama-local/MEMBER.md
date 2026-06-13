@@ -6,6 +6,7 @@ interface: cli
 status: probation
 cost_band: free
 data_handling: BLOCKED   # see below — local ≠ automatically cleared; clear it consciously
+roles: [generator]       # rate it as a verifier before using it as a check=<name>
 evaluated: []
 member_version: UNVERIFIED — record `ollama --version` + the exact model tag (e.g. qwen3:8b)
 ---

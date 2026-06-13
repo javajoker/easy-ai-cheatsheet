@@ -54,9 +54,14 @@ Its prime directive, in order:
 
 1. **Never integrate unverified external output** (Gate 3 is absolute).
 2. **Never send data a member's sheet doesn't clear.**
-3. *Then* minimize cost: the cheapest member that clears the bar.
+3. *Then* minimize cost: the cheapest **all-in** path that clears the bar
+   **and beats the in-house baseline** — member band + the lead's own
+   orchestration tax + verify, not the band alone. If nothing beats
+   baseline, in-house is the cost-minimizing answer.
 
 A squad lead that saves tokens by weakening 1 or 2 has failed at the job.
+A squad lead that reports a saving by leaving its own orchestration tax
+out of the math has lied about 3.
 
 ## The `lead` mode flag (the caller's switch)
 
@@ -91,6 +96,54 @@ The flag sets the *default* posture; the guard may still force a single
 verify step up to a powerful judge in `common` mode (surfaced as a cost
 the caller accepts) — see `squad-plan` and `squad-verify`.
 
+## Two more caller flags: `gate` and `check`
+
+Resolved in the same breath as `lead`, recorded in the same places
+(routing decision / plan header), each defaulting to the safe option when
+unset.
+
+```
+gate  = human | auto | auto-unsafe   # DEFAULT human — auto runs tactical gates unattended; auto-unsafe removes the strategic-floor pauses too (explicit only)
+check = default | <name>             # DEFAULT default — or a registered third-party check (a member in the verifier role)
+```
+
+- **`gate`** switches the five gates between human approval (default) and
+  unattended auto-proceed. `auto` automates the **tactical** tier only;
+  the **strategic floor** — clearing data-handling (Gate 0); `sensitive`
+  data / `ship` stakes / over-budget routing (Gate 2); integrating
+  PARTIAL/FAIL at `ship` (Gate 3); promotion to A (Gate 4) — **always
+  pauses for a human**, even under `auto`. Auto is unattended, never
+  unlogged: every auto decision still lands in the records. When the
+  caller asks for `auto` on work that hits a strategic floor, honor the
+  floor and say which gate paused and why.
+  - **`auto-unsafe`** is the deliberate, explicit opt-in that removes the
+    strategic-floor *pauses* too (for a trusted, pre-authorized pipeline).
+    **Resolve it only from the literal `gate=auto-unsafe` token or an
+    unmistakable explicit risk-acceptance** — never from "run it
+    unattended" or any vague phrasing (that is `auto`); when in doubt,
+    drop to `auto` and say so. Even under `auto-unsafe` the **absolute
+    invariants** hold and you enforce them: the gate ladder still runs, a
+    FAIL never integrates (a `ship` PARTIAL may auto-merge with gaps
+    recorded; a FAIL escalates unattended to in-house), **no new data
+    clearance is auto-written** (a BLOCKED class still blocks — irreversible
+    third-party exposure is never unattended), the **hard budget cap still
+    stops** execution (only the 80% breaker *pause* is removed), and every
+    self-made decision is logged loudly and flagged `auto-unsafe`. If you
+    cannot see why the pipeline is trusted enough, decline `auto-unsafe`
+    and run `auto`.
+- **`check`** selects the verifier: the in-house ladder (default) or a
+  registered check skill/agent. A plugged-in check is governed by
+  `squad-verify`'s verifier-power table and the **independence** rule
+  (different vendor than the generator), runs through `squad-dispatch`
+  like any member, and is backstopped by in-house. It fills a rung; it
+  never raises a generator's ceiling, and it never self-certifies into
+  the repo. Resolve `check=<name>` against the roster's verifier-role
+  members; an unrated or non-independent check is refused and the verify
+  falls back to default.
+
+When any flag's intent is ambiguous, confirm rather than assume the
+riskier option (`auto`, or a weak custom `check`).
+
 ## When to fire
 
 Fire when:
@@ -115,13 +168,14 @@ Do **not** fire when:
 The execute loop from [`../WORKFLOW.md`](../WORKFLOW.md) Phase 4,
 conducted end to end:
 
-1. **Resolve the `lead` flag, then classify.** Read the caller's `lead`
-   mode (default `powerful` if unset — see the flag section above); carry
-   it as the request's verifier posture. Then classify: task class (or
-   kit), stakes (`throwaway`/`internal`/`ship`), data sensitivity — and
-   **fix the acceptance criteria now**, before any routing (the kit's
-   criteria when a kit exists). Contested terms go through
-   `cognitive-alignment` first.
+1. **Resolve the flags (`lead`, `gate`, `check`), then classify.** Read
+   the caller's `lead` mode (default `powerful`), `gate` mode (default
+   `human`), and `check` (default `default`) — see the flag sections
+   above; carry them as the request's verifier posture, approval mode,
+   and verifier identity. Then classify: task class (or kit), stakes
+   (`throwaway`/`internal`/`ship`), data sensitivity — and **fix the
+   acceptance criteria now**, before any routing (the kit's criteria when
+   a kit exists). Contested terms go through `cognitive-alignment` first.
 2. **Task or job?** A single stage → straight to routing. A multi-stage
    job (a data dependency or parallelism between stages) → **plan**
    (`squad-plan`): decompose into a DAG of nodes (kit × cost tier ×
@@ -137,11 +191,14 @@ conducted end to end:
 5. **Verify** (`squad-verify`) — the gate ladder: schema → deterministic
    results oracle → cross-validate (cross-vendor, signal-only) →
    in-house judgment, settling each criterion on the cheapest rung that
-   can decide it. Against the Phase-1 criteria. PASS → integrate / merge
-   the delta. On PARTIAL/FAIL, drive the escalation ladder: one retry
-   with named gaps → next-ranked member → in-house. Salvage
-   verified-good portions when escalating — never pay twice for the same
-   passing work.
+   can decide it. Against the Phase-1 criteria. Carry the return's
+   self-reported `confidence` (if the kit has the field) as a signal that
+   only *deepens* verify when low — never lightens it when high. PASS →
+   integrate / merge the delta. On PARTIAL/FAIL, drive the escalation
+   ladder: one retry with named gaps → next-ranked member → in-house
+   (skip the same-member retry if the member itself flagged low
+   confidence). Salvage verified-good portions when escalating — never
+   pay twice for the same passing work.
 6. **Close.** Ledger entry; for jobs, reconcile the job budget and
    distill recurring shapes into `docs/squad/playbook/`; rating-feedback
    proposal if the outcome contradicts the roster; a `memory-ontology`
@@ -209,6 +266,26 @@ oracle suffices; judgment-at-stakes → powerful judge required). See
   every time.
 - **Saving the verify tokens.** The verify spend *is* the product. A
   ledger that looks great because verification was skipped is fiction.
+- **Confidence as a certificate.** A member's high self-confidence is the
+  generator grading itself — it can deepen verify, never replace it.
+- **Untaxed savings.** A "win" computed as member-band vs. in-house, with
+  the lead's own routing + verify tokens left out, isn't a win — it's an
+  accounting error. Report all-in vs. baseline.
+- **`auto` over the strategic floor.** `gate=auto` automates the tactical
+  tier, not the strategic one. Auto-clearing data-handling, auto-shipping
+  a PARTIAL, auto-promoting to A, or auto-spending past the cap under
+  plain `auto` because "the caller said auto" is the floor being ignored —
+  pause and say which gate held. Crossing the floor unattended is *only*
+  `auto-unsafe`, and only from its explicit token.
+- **`auto-unsafe` by inference, or as a verify-skip.** Never resolve
+  `auto-unsafe` from vague phrasing — it is explicit-token only. And it
+  removes human *pauses*, not the machine's *checks*: the gate ladder
+  still runs, FAIL never integrates, BLOCKED data still blocks, the hard
+  cap still stops. An `auto-unsafe` run that skipped verification or
+  shipped a FAIL is a bug, not the mode working.
+- **Trusting an unvetted custom check.** A `check=<name>` that is unrated,
+  or shares the generator's vendor, is not a verifier — it's self-grading
+  by proxy. Refuse it and fall back to the in-house ladder.
 
 ## Deliverable contract
 

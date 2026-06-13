@@ -103,4 +103,7 @@ until re-measured (`member-retune` discipline).
   rolling record → proposal. Promotion: a fresh eval or a sustained pass
   record → proposal. Never a single anecdote in either direction.
 - Status moves to `benched`/`retired` cite the ledger summary
-  (`member-retune` produces it).
+  (`member-retune` produces it) — including the **all-in vs. baseline**
+  gap: a member whose accepted-task cost (member + orchestration tax +
+  verify + escalation) stops beating in-house has lost its reason for the
+  seat, however good its ratings look.

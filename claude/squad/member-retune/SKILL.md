@@ -60,8 +60,9 @@ the session.
 
 Summarize the member's record from `docs/squad/ledger.md`: dispatches,
 pass rate, escalation rate, **true cost per accepted task** (member cost
-+ verify + escalation overhead). Compare against in-house doing the same
-work. Propose accordingly: keep / `benched` (seat not currently
++ orchestration tax + verify + escalation overhead) — the ledger's
+**all-in vs. baseline** columns make this directly readable. Compare
+against in-house doing the same work. Propose accordingly: keep / `benched` (seat not currently
 justified; sheet kept) / `retired` (sheet archived, roster row kept for
 ledger history). A bench/retire proposal cites the record, never an
 incident.

@@ -121,6 +121,49 @@ under `common` will be flagged and either escalated to a powerful judge
 (you accept the spend) or declined. Unsure which to use? Omit the flag —
 `powerful` is always correct, just not always cheapest.
 
+## Choosing the gate mode and the check (two more switches)
+
+Two more caller flags, same shape as `lead` — omit either for its safe
+default:
+
+```
+gate  = human | auto | auto-unsafe   # human (default): gates ask. auto: tactical gates run unattended. auto-unsafe: strategic floor too (explicit only).
+check = default | <name>             # default (in-house ladder), or your own registered check.
+```
+
+```
+> Squad this and run it unattended — gate=auto.
+> Translate these 40 files, auto-approve the routine gates.
+> Verify the generated client with check=my-oss-linter.
+> Use codex-cli to draft and gemini-cli as the check.        (check = a different vendor)
+```
+
+- **`gate=auto`** removes the approval click on the **tactical** tier
+  (eval specs, routine sub-`ship` routes under cap, PASS integrations,
+  demotions). It **never** removes it on the **strategic floor**:
+  clearing what data may leave in-house, `sensitive`/`ship`/over-cap
+  routes, shipping a PARTIAL at `ship`, or promoting to A always pause for
+  you. Auto is unattended bulk throughput, not a blank cheque — and every
+  auto decision is still written to the records.
+- **`gate=auto-unsafe`** is the explicit opt-in for a trusted,
+  pre-cleared, pre-budgeted pipeline that wants *no* human in the loop —
+  it removes the strategic-floor pauses too (`ship` routes, `ship`
+  PARTIAL integrations, promotions). You must type the literal
+  `gate=auto-unsafe`; "run it unattended" gets you plain `auto`, never
+  this. Even here the **absolute invariants** hold: verification still
+  runs, a FAIL never integrates, a BLOCKED data class still blocks (it
+  never auto-clears data to a vendor), the hard budget cap still stops the
+  run, and everything is logged and flagged `auto-unsafe`. If you can't
+  say why the pipeline is trusted enough, you want `auto`.
+- **`check=<name>`** points the verifier at a registered check (an
+  oracle, an open-source checker, another vendor's review agent) instead
+  of the in-house ladder. It must be **a different vendor than the
+  member it checks** (a same-model check is self-grading) and rated as a
+  verifier; it runs under the same dispatch control as any member and
+  **falls back to in-house** if it errors or is too weak for the stakes.
+  A custom check fills a rung — it never lets a weak generator ship
+  `ship`-stakes judgment on the check's say-so alone.
+
 ## Executing a task through the squad
 
 ```
@@ -184,11 +227,12 @@ old version, and proposes which evals to re-run (not all — only task
 classes where the version plausibly moved the result). Old `(measured)`
 evidence is demoted to `(stale)` until re-measured, never silently kept.
 
-## Four disciplines that keep it honest
+## Five disciplines that keep it honest
 
 - **Never route on `(claimed)`.** Vendor benchmarks decide *what to
   evaluate first*, never *who gets work*. Only `(measured)` evidence moves
-  a rating above U.
+  a rating above U. A member's self-reported `confidence` is the same:
+  a signal that can deepen verify when low, never a route or a pass.
 - **Verification is in-house and non-negotiable.** The point of the layer
   is to spend Claude tokens on verification instead of generation. Skipping
   verify to save the verify cost re-imports the risk you delegated away.
@@ -199,6 +243,12 @@ evidence is demoted to `(stale)` until re-measured, never silently kept.
   take throwaway drafts; shipping code needs A or B plus full verify. A
   task touching sensitive data needs a cleared data-handling section — or
   it stays in-house.
+- **Count the tax; beat the baseline.** The cost that matters is
+  **all-in** — the member band *plus this lead's own orchestration tokens*
+  *plus verify* — measured against the **baseline** of Claude just doing
+  it. The ledger records both; route only when all-in wins. Dedup
+  identical inputs and reuse verified results (`squad-state`'s cache) to
+  widen that margin, but never let a saving skip a gate.
 
 ## How this differs from neighbouring machinery
 

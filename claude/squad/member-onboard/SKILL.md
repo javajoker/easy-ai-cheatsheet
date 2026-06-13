@@ -42,8 +42,11 @@ Create `members/<name>/MEMBER.md` from the template in
 [`members/README.md`](../members/README.md):
 
 - Frontmatter: `status: probation`, the best-guess `cost_band`,
-  `data_handling: BLOCKED`, `evaluated: []`, and `member_version` from the
-  actual installed version (`<cli> --version`) — run it; don't guess.
+  `data_handling: BLOCKED`, `roles: [generator]` (a new member is a
+  generator until it's separately rated as a verifier — see
+  [`members/README.md`](../members/README.md)), `evaluated: []`, and
+  `member_version` from the actual installed version (`<cli> --version`) —
+  run it; don't guess.
 - Invocation contract: exact command shape, auth **mechanism** (never the
   value), input/output paths, non-interactive flags, timeout default.
 - Capability sheet: vendor-doc facts only, each line `(claimed)` with a

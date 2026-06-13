@@ -81,9 +81,9 @@ squad/
 Run artifacts live in the **project**, not in this layer:
 `docs/squad/evals/` (eval reports), `docs/squad/jobs/` (job plans +
 State Ledgers), `docs/squad/dispatches/` (dispatch records),
-`docs/squad/playbook/` (reusable job plans), and `docs/squad/ledger.md`
-(the cost ledger) — the same convention as `docs/skill-evolution/` for
-proposals.
+`docs/squad/playbook/` (reusable job plans), `docs/squad/cache/` (the
+verified-result cache), and `docs/squad/ledger.md` (the cost ledger) —
+the same convention as `docs/skill-evolution/` for proposals.
 
 ## The shape of the family
 
@@ -145,6 +145,10 @@ inventing new discipline:
    judgment**. Consensus is a filter, never a certificate; no member ever
    self-certifies into the repo. The verifier's *required* power is set
    by the task class, not chosen — see the configurations below.
+   **A member's self-reported confidence is a signal, never a certificate
+   either:** it can only *raise* scrutiny (low confidence deepens verify
+   or pre-empts escalation), never lower a gate. A member confident in
+   its own work is still graded by the verifier.
 5. **Structured handoffs, not chat.** Members never inherit
    conversational history; they receive hydrated payloads (only the
    ledger keys their node declares) and return schema-checked deltas.
@@ -153,11 +157,178 @@ inventing new discipline:
 6. **Data sensitivity gates routing.** A task touching secrets, customer
    data, or unreleased code only routes to members whose sheet has the
    data-handling section cleared by a human. When in doubt, in-house.
-7. **The ledger learns.** Every dispatch records estimated vs. actual cost
-   and the verify outcome; jobs run under a budget with an 80% circuit
-   breaker. Ratings move on evidence — two verified failures demote;
+7. **The ledger learns, and counts the tax.** Every dispatch records
+   estimated vs. actual cost and the verify outcome; jobs run under a
+   budget with an 80% circuit breaker. The cost it records is **all-in**:
+   the member spend *plus the orchestration tax* — the lead's own
+   classify/route/verify tokens — and beside it a **`baseline`** figure
+   (what in-house would have cost). The layer only earns its place when
+   all-in < baseline, so that comparison is a column, not an article of
+   faith — and `squad-plan` declines a job whose all-in can't beat
+   baseline. Ratings move on evidence — two verified failures demote;
    sustained passes promote — always through a diff-previewed roster
    edit; successful job plans distill into a reusable playbook.
+
+## Two governance tiers, and the role/permission model
+
+Governance in this layer is a **stack of two tiers**, and the upper one
+gates the lower:
+
+- **Strategic tier — the outsourcing policy.** *Whether* a piece of work
+  may leave in-house at all. It is set by a human, at onboarding (the
+  data-handling clearance — what data classes a vendor may ever see) and
+  at classify time (stakes, value/safety constraints, vendor trust). A
+  task the strategic tier forbids never reaches routing, however cheap a
+  member looks.
+- **Tactical tier — the wire contract.** *How* permitted work crosses
+  members without losing control: the kit's JSON input/output contract,
+  the State Ledger schema, and the five gates. This is the factory floor;
+  the strategic tier is the licence to operate it.
+
+This is the concrete form of the **"structured professional roles +
+permission boundaries"** model: a member's **per-task-class rating** is
+its professional role (what it is *qualified* to do, by `(measured)`
+evidence — A clears `ship`, C clears `throwaway`), and its
+**data-handling clearance** is its permission boundary (what it may ever
+*touch*). Routing is exactly role-based access control: qualified **and**
+cleared **and** active, then cheapest. Neither axis substitutes for the
+other — a brilliant member with no clearance for the data stays
+in-house, and a cleared member with a U rating takes nothing that
+matters.
+
+## The `gate` flag — human, auto, or auto-unsafe
+
+The five gates pause for a human by default. The **`gate` flag** lets the
+caller run them unattended — by default still along the line the
+governance tiers draw (**`auto` automates the *tactical* tier; the
+*strategic* tier still pauses**), or, with an explicit and deliberately
+ugly third value, all the way (**`auto-unsafe` removes the strategic-floor
+*pauses* too**, keeping only a hard set of non-negotiable invariants).
+
+```
+gate = human         # DEFAULT — every gate pauses for approval as documented
+gate = auto          # tactical gates auto-proceed (recorded, not silent); strategic floor still pauses
+gate = auto-unsafe   # OPT-IN, explicit only — strategic-floor pauses removed too; absolute invariants remain
+```
+
+Set it like `lead` — a flag (`gate=auto`) or plain language ("run it
+unattended", "auto-approve the gates"). `squad-lead` resolves it, records
+it (`gate-mode:` in the routing decision / plan header — named to avoid
+colliding with a node's `gate` *rung*), and each gate honors it. **Unset
+means `human`** — the safe default; the lead never goes unattended on its
+own. **Plain language never reaches `auto-unsafe`** — "run it unattended"
+resolves to `auto`; the unsafe mode requires the literal `gate=auto-unsafe`
+token (or an unmistakable explicit acceptance of the risk), so it can
+never be entered by accident or by a vague instruction.
+
+What `auto` may decide on its own (tactical): the eval spec (Gate 1), a
+sub-`ship` route under the budget cap (Gate 2), a PASS integration
+(Gate 3, as today), and a roster **demotion** (Gate 4 — removing trust is
+conservative). What **always** pauses even under `auto` (the strategic
+floor):
+
+- **Gate 0** — clearing or widening a member's data-handling clearance.
+  *What data may leave in-house is never an auto decision.*
+- **Gate 2** — `sensitive` data, `ship` stakes, or any estimate **over
+  the budget cap**.
+- **Gate 3** — integrating **PARTIAL/FAIL** output at `ship` stakes.
+- **Gate 4** — a **promotion to A** (granting `ship`-clearing trust).
+
+So `gate=auto` buys unattended bulk throughput without ever letting the
+machine self-grant trust, spend past its cap, or send data a human hasn't
+cleared. Everything `auto` decides is still written to the same records —
+auto is *unattended*, never *unlogged*.
+
+### `gate=auto-unsafe` — for a trusted, pre-authorized pipeline
+
+A trusted internal pipeline whose members are already cleared and whose
+budget is already set may want to run *fully* unattended — through
+`ship`-stakes routes, PARTIAL integrations, and roster promotions — with
+no human in the loop at all. `gate=auto-unsafe` is that mode. It removes
+the strategic-floor **pauses** the table above lists. It does **not**
+remove safety — because the floor mixed two different things, and only
+one of them is an "ask a human to proceed" decision. `auto-unsafe`
+proceeds on the proceed-decisions; it preserves the **absolute
+invariants**, which are not approvals but correctness and boundary
+mechanisms no approval mode may touch:
+
+1. **The gate ladder always runs.** `auto-unsafe` is *no human pause*, not
+   *no verification*. Every output is still verified; a verdict is always
+   computed. It changes who (if anyone) clicks approve — never whether the
+   check happens.
+2. **FAIL never integrates.** A `ship`-stakes PARTIAL may auto-integrate
+   with its gaps recorded; a FAIL still runs the escalation ladder
+   (unattended) and lands in-house. `auto-unsafe` cannot turn a FAIL into
+   a merge.
+3. **No new data clearance is auto-written.** It operates strictly within
+   the `data_handling` clearances already on the sheets. Sending a data
+   class to a third-party vendor is irreversible — that boundary is never
+   crossed unattended, even here. A BLOCKED clearance still blocks.
+4. **The hard budget cap still stops.** The 80% breaker *pause* is gone,
+   but execution still halts at 100% of the authorized cap. `auto-unsafe`
+   runs freely *up to* the ceiling the human set; it never raises the
+   ceiling itself.
+5. **No self-grading, ever, and everything is logged.** Independence of
+   verifier from generator still holds; no member or check self-certifies;
+   and every decision `auto-unsafe` makes on its own is written loudly to
+   the records, flagged as auto-unsafe.
+
+In short: `auto` removes the *routine* clicks; `auto-unsafe` removes the
+*high-stakes* clicks too, for a caller who has accepted that risk in
+advance — but neither removes verification, the FAIL bar, the data
+boundary, the spend ceiling, or the audit trail. "Unsafe" means
+*un-gated by a human*, not *un-checked by the machine*. If you can't name
+why your pipeline is trusted enough for it, you want `auto`.
+
+## The `check` flag — the default verifier or a plugged-in one
+
+The verifier is the in-house gate ladder by default. The **`check` flag**
+lets the caller substitute or augment it with a registered third-party
+check — your own oracle, an open-source checker, a different vendor's
+review agent — without weakening the bright line.
+
+```
+check = default        # DEFAULT — the in-house gate ladder (schema → oracle → cross-validate → in-house)
+check = <name>         # a registered check (skill or agent) slotted into the ladder at its earned rung
+```
+
+A plugged-in check is **a member in the verifier role**: it registers and
+rates like any member (its trust is `(measured)`, never `(claimed)`), it
+runs through `squad-dispatch` (sandbox, caps, transcript — an external
+check is still an external call), and four constraints keep it honest:
+
+1. **Independence.** A check must be a *different vendor/instance* than
+   the generator. A check sharing the generator's model is self-grading
+   wearing a plugin's costume — `squad-route` refuses it.
+2. **The verifier-power table still governs.** A check certifies only
+   what its rung earns: a **deterministic** check (runs code/tests —
+   objective) can certify verifiable output (assurance bounded by the
+   check, like any oracle); a **judgment** check is a `cross-validate`
+   signal at sub-`ship` and **escalates** at `ship`. A custom check does
+   not raise a generator's ceiling — it fills a rung.
+3. **In-house is the backstop.** A check that errors, times out, or is
+   unrated falls back to the in-house ladder. A `ship`-stakes judgment
+   call still ends at a powerful judge; a plugged-in checker can stand in
+   only if it is itself trusted at that power and independent.
+4. **It never self-certifies into the repo.** Same Gate 3 as everything
+   else — a check's verdict is a signal feeding the gate, not a merge.
+
+So "bring your own checker" is fully supported, and it is governed by the
+exact rule that governs everything else: **assurance is bounded by the
+verifier's power and independence — whoever the verifier is.**
+
+## Squad inside a Loop
+
+Squad is the level-5 paradigm that extends **Loop Engineering** (level 4
+— recursive self-correction within one model); the references trace the
+lineage. Operationally the relationship is direct: the **execution loop**
+(route → dispatch → verify → escalate, bounded by the 80% breaker) *is* a
+controlled Loop, and Squad is its per-step **execution engine** — each
+iteration runs a sub-task on the cheapest cleared member instead of on
+the one flagship. The escalation ladder and the budget breaker are the
+loop's termination conditions; the State Ledger is its memory. A
+framework Loop drives the squad; the squad does not replace it. The two
+compose.
 
 ## Lead–member power configurations
 
@@ -229,6 +400,7 @@ In this folder (canonical):
 - **Who can do what, today:** [ROSTER.md](ROSTER.md)
 - **The kit contract:** [kits/README.md](kits/README.md)
 - **Design sources + concept map:** [references/README.md](references/README.md)
+- **Review response (challenges + suggestions → where each landed):** [references/04-review-response.md](references/04-review-response.md)
 
 Elsewhere in the framework:
 
