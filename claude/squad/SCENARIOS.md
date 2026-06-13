@@ -160,9 +160,13 @@ records what it really cost.
 ### Procedure
 
 1. Invoke the [`squad-lead`](squad-lead/AGENT.md) agent ("route this
-   through the squad"). It **classifies**: task class, stakes
+   through the squad" — optionally with `lead=common` to run Situation 2;
+   omit the flag for the `powerful` default). It resolves the `lead` mode
+   then **classifies**: task class, stakes
    (`throwaway`/`internal`/`ship`), data sensitivity — and fixes the
-   acceptance criteria *before* routing.
+   acceptance criteria *before* routing. Under `lead=common` the
+   single-task Situation-2 guard applies (verifiable → oracle; sub-`ship`
+   judgment → cross-validate; `ship` judgment → escalate or decline).
 2. [`squad-route`](squad-route/) filters the roster: rating clears the
    stakes bar, data-handling covers the inputs, status allows the work.
    Cheapest eligible band wins. **Gate 2:** the decision (member, why,
@@ -290,12 +294,15 @@ target is won or lost.
 
 ### Procedure
 
-1. Invoke the [`squad-lead`](squad-lead/AGENT.md) agent; it classifies
-   and recognizes a *job* (multi-stage), not a task.
+1. Invoke the [`squad-lead`](squad-lead/AGENT.md) agent (optionally with
+   `lead=common` / `situation=2`; omit for the `powerful` default). It
+   resolves the `lead` mode, then classifies and recognizes a *job*
+   (multi-stage), not a task.
 2. [`squad-plan`](squad-plan/) checks the playbook for a reusable plan,
-   else declares the **verifier posture** (`powerful` default, or
-   `common` for a cheap conductor — Situation 2) and decomposes the job
-   into a DAG: per node a **kit** (or task class), **target cost tier**
+   else inherits the **verifier posture** from the caller's `lead` flag
+   (`powerful` default, or `common` for a cheap conductor — Situation 2)
+   and decomposes the job into a DAG: per node a **kit** (or task class),
+   **target cost tier**
    (never a member name — members resolve at dispatch time against the
    live roster), declared **ledger inputs/outputs**, and the **cheapest
    sufficient gate** (schema → deterministic oracle → cross-validate →

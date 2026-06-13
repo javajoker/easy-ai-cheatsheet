@@ -58,12 +58,20 @@ delegation imports, and the one consensus is worst at catching.
 
 ### Phase 0 — Load the contract
 
-From the dispatch record: the acceptance criteria (fixed at classify
-time, *before* routing — if they're missing or were edited after
-dispatch, stop; that's a process failure to surface, not to paper over),
-the sandbox location, the member's rating (it sets judgment-rung depth),
-and the node's declared `gate` (the planned rung — `squad-plan` sets it;
-this skill may climb higher but never silently lower).
+From the dispatch record: the **`lead` mode** (`powerful` default, or
+`common` — the routing decision / plan header records it), the acceptance
+criteria (fixed at classify time, *before* routing — if they're missing
+or were edited after dispatch, stop; that's a process failure to surface,
+not to paper over), the sandbox location, the member's rating (it sets
+judgment-rung depth), and the node's declared `gate` (the planned rung —
+`squad-plan` sets it; this skill may climb higher but never silently
+lower).
+
+The mode decides whether the in-house judgment rung is freely available
+(`powerful` — yes, it is the default verifier) or constrained (`common`
+— the verifier-power table below governs; a `ship`-stakes judgment row
+cannot settle below in-house, and reaching in-house there is the
+caller-accepted one-node escalation, not the silent default).
 
 ### Phase 1 — Audit
 

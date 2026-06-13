@@ -162,6 +162,7 @@ scenario — see [`references/`](references/README.md).)
 
 ```markdown
 # Job plan — 2026-06-13-q3-trends
+lead: powerful            # caller set no flag ⇒ Situation 1 default
 objective: Extract Q3 revenue metrics from the 50-pg report and graph the trend.
 budget: mid band, breaker at 80%
 
@@ -232,16 +233,19 @@ not on generation or on shuttling history between members.
 
 ## Example 5 — Situation 2: a common lead commanding powerful members
 
-**Setup.** The conductor is deliberately run on a cheap model (say, to
-orchestrate from a low-cost host) — `verifier: common`. The job routes
-*frontier* members. The question Situation 2 forces: with a weak lead,
-what verifies the powerful members' output? Two job nodes, two answers.
+**Setup.** The caller invokes with the switch set —
+*"build the API client — `lead=common`"* (equivalently `situation=2`).
+Had they omitted the flag, the job would run Situation 1 (`powerful`)
+and none of the guard below would apply. The conductor is therefore a
+cheap model, and the job routes *frontier* members. The question
+Situation 2 forces: with a weak lead, what verifies the powerful
+members' output? Two job nodes, two answers.
 
-**Job plan header (`squad-plan`):**
+**Job plan header (`squad-plan`, posture inherited from the flag):**
 
 ```markdown
 # Job plan — 2026-06-13-api-client
-verifier: common          # cheap conductor — the Situation-2 guard is active
+lead: common              # from the caller's flag — the Situation-2 guard is active
 budget: mid band, breaker at 80%
 
 | node | kit | tier | output | gate | guard check |

@@ -15,6 +15,9 @@ everything it decides is written down before dispatch.
 
 Inputs (from `squad-lead`'s classify step, or gathered now):
 
+- **`lead` mode** — `powerful` (default if unset) or `common`. The
+  caller's switch between the two situations; it decides whether the
+  single-task guard below applies.
 - **Task class** — one of the roster columns.
 - **Stakes** — `throwaway` / `internal` / `ship`.
 - **Data sensitivity** — `public` / `internal` / `sensitive`, judged on
@@ -22,6 +25,16 @@ Inputs (from `squad-lead`'s classify step, or gathered now):
   messages.
 - **Acceptance criteria** — must already be fixed. Routing before
   criteria invites criteria that fit whatever came back.
+
+**Single-task Situation-2 guard.** When `lead=common`, the same rule
+`squad-plan` applies per node applies to a lone task: if it routes a
+member more capable than the common verifier, its verification must rest
+on a deterministic oracle (verifiable output) or a sub-`ship` cross-vendor
+`cross-validate` gate (judgment output). A `ship`-stakes judgment task
+under `lead=common` with no oracle is **not routable as-is** — surface
+it and either escalate its verify step to a powerful judge (caller
+accepts the premium spend) or decline. Under `lead=powerful` (default)
+the guard is inactive — the in-house judge can certify anything.
 
 ### Phase 1 — Filter for eligibility
 
@@ -59,10 +72,12 @@ Write the routing decision (it becomes the head of the dispatch record):
 
 ```markdown
 # Routing decision — <date>-<slug>
+lead: <powerful|common>      # the caller's mode (powerful if unset)
 task class / stakes / data: <…>
 eligible:  <member (rating, band, clearance)>…
 excluded:  <member — first failed filter>…
 chosen:    <member> · estimated cost: <band × volume>
+gate:      <schema|deterministic|cross-validate|in-house>   # under lead=common, what carries verification
 fallback:  <next-ranked member or in-house>
 ```
 

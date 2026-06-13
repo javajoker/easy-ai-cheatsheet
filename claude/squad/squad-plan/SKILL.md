@@ -22,20 +22,24 @@ or a parallelism opportunity. Before drafting, check
 beats re-planning (the reference docs' path-caching, made explicit and
 human-approved).
 
-Declare the **verifier posture** for the job, because it changes what
-nodes are legal:
+Inherit the **verifier posture** from the caller's `lead` mode flag
+(resolved by `squad-lead`; default `powerful` when unset). The planner
+does not choose it — the caller does — but it governs what nodes are
+legal:
 
-- **`powerful`** (default) — the lead/verifier is in-house premium
-  Claude. This is Situation 1: any node tier is fine, because the
-  powerful verifier can judge any member's output. Most jobs.
-- **`common`** — the lead/verifier is deliberately a cheaper model
-  (Situation 2: a low-cost conductor commanding powerful members). Legal,
-  but it triggers the oracle guard in Phase 1: a weak verifier cannot
-  certify a strong member's judgment output, so each such node must be
-  carried by something objective instead.
+- **`powerful`** (default — `lead=powerful` / unset) — the lead/verifier
+  is in-house premium Claude. Situation 1: any node tier is fine, because
+  the powerful verifier can judge any member's output. Most jobs.
+- **`common`** (`lead=common`) — the lead/verifier is deliberately a
+  cheaper model (Situation 2: a low-cost conductor commanding powerful
+  members). Legal, but it triggers the oracle guard in Phase 1: a weak
+  verifier cannot certify a strong member's judgment output, so each such
+  node must be carried by something objective instead.
 
-Record the posture in the plan header; it is the precondition the Phase-1
-guard checks every node against.
+Record the inherited posture in the plan header (`lead: powerful|common`);
+it is the precondition the Phase-1 guard checks every node against. If
+the caller set no flag, the header reads `lead: powerful` — never leave
+it implicit.
 
 ### Phase 1 — Decompose into nodes
 

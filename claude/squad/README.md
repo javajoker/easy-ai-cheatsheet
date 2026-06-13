@@ -166,7 +166,25 @@ arrangements, with different guardrails. The invariant underneath both:
 **assurance is bounded by the verifier, not the generator** (discipline
 4), so the question is always *what is verifying the output*.
 
-| | **Situation 1 (endorsed default)** | **Situation 2 (supported, guarded)** |
+**The caller chooses with the `lead` flag.** It is a manual switch, and
+**unset means Situation 1** (the safe default — the lead never drops to
+`common` on its own):
+
+```
+lead = powerful   # Situation 1 — powerful in-house verifier  (DEFAULT)
+lead = common     # Situation 2 — cheap conductor; oracles / cross-validate carry verification
+alias:  situation = 1 | 2
+```
+
+Set it as a skill/agent argument (`lead=common`) or in plain language
+("use a common lead", "Situation 2 mode"). `squad-lead` resolves it
+first, records it as `lead:` in the routing decision (tasks) and the plan
+header (jobs), and `squad-plan` / `squad-verify` enforce the matching
+guardrails. The flag sets the *default* posture; in `common` mode the
+guard may still force a single verify step up to a powerful judge, which
+the caller accepts as a cost.
+
+| | **Situation 1 (`lead=powerful`, default)** | **Situation 2 (`lead=common`)** |
 |---|---|---|
 | Lead / verifier | powerful (in-house premium Claude) | common (a cheaper conductor) |
 | Members | modest, **kit-matched to each task** | the most powerful (frontier tier) |

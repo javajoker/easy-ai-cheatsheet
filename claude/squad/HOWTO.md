@@ -96,6 +96,31 @@ Two skills, two checkpoints:
    `evaluated: <task-class|kit>@<member-version>` stamp makes the run
    idempotent.
 
+## Choosing the lead mode (the caller's switch)
+
+Before (or while) you hand work to the squad, you can pick which power
+configuration runs with the **`lead` flag** — and **if you set nothing,
+you get Situation 1** (powerful in-house verifier), the safe default:
+
+```
+lead = powerful   # Situation 1 — DEFAULT (omit the flag and you're here)
+lead = common     # Situation 2 — cheap conductor; oracles / cross-validate verify
+alias:  situation = 1 | 2
+```
+
+```
+> Squad this: convert these 40 YAML configs to TOML.            (no flag ⇒ powerful)
+> Generate the OpenAPI client — lead=common.                    (Situation 2)
+> Run this whole job in Situation 2: extract, code, document.   (alias)
+```
+
+`lead=common` only routes safely where verification can rest on a
+deterministic oracle (verifiable output) or a sub-`ship` cross-vendor
+cross-validate filter (judgment output); a `ship`-stakes judgment task
+under `common` will be flagged and either escalated to a powerful judge
+(you accept the spend) or declined. Unsure which to use? Omit the flag —
+`powerful` is always correct, just not always cheapest.
+
 ## Executing a task through the squad
 
 ```

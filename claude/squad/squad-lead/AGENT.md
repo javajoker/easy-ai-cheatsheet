@@ -58,6 +58,39 @@ Its prime directive, in order:
 
 A squad lead that saves tokens by weakening 1 or 2 has failed at the job.
 
+## The `lead` mode flag (the caller's switch)
+
+The caller chooses which of the two power configurations runs. It is the
+**first thing the lead resolves**, before classify, because it changes
+the whole verify workflow.
+
+```
+lead = powerful   # Situation 1 — powerful in-house verifier (DEFAULT)
+lead = common     # Situation 2 — cheap conductor; verification moves onto oracles / cross-validate
+alias:  situation = 1 | 2     (1 ⇒ powerful, 2 ⇒ common)
+```
+
+- **Unset ⇒ `powerful`.** No flag means Situation 1 — the safe default.
+  The lead never silently drops to `common`; the caller must ask for it.
+- **How the caller sets it:** as a skill/agent argument
+  (`lead=common`, `situation=2`) or in plain language ("run this with a
+  common lead", "use Situation 2", "cheap conductor mode"). When the
+  caller's intent is ambiguous, confirm rather than assume `common`.
+- **What it switches:** the verifier posture for the whole request.
+  `powerful` → the in-house judgment rung is available and is the default
+  verifier (today's path). `common` → the Situation-2 guard is active:
+  verification must rest on a deterministic oracle (verifiable output) or
+  a sub-`ship` cross-vendor `cross-validate` gate (judgment output), and
+  a `ship`-stakes judgment step is illegal under `common` unless the
+  caller explicitly accepts a one-node escalation to a powerful judge.
+- **It is recorded** in the routing decision (tasks) and the plan header
+  (jobs) as `lead: powerful|common`, so every dispatch record shows which
+  workflow ran.
+
+The flag sets the *default* posture; the guard may still force a single
+verify step up to a powerful judge in `common` mode (surfaced as a cost
+the caller accepts) — see `squad-plan` and `squad-verify`.
+
 ## When to fire
 
 Fire when:
@@ -82,11 +115,13 @@ Do **not** fire when:
 The execute loop from [`../WORKFLOW.md`](../WORKFLOW.md) Phase 4,
 conducted end to end:
 
-1. **Classify.** Task class (or kit), stakes
-   (`throwaway`/`internal`/`ship`), data sensitivity — and **fix the
-   acceptance criteria now**, before any routing (the kit's criteria
-   when a kit exists). Contested terms go through `cognitive-alignment`
-   first.
+1. **Resolve the `lead` flag, then classify.** Read the caller's `lead`
+   mode (default `powerful` if unset — see the flag section above); carry
+   it as the request's verifier posture. Then classify: task class (or
+   kit), stakes (`throwaway`/`internal`/`ship`), data sensitivity — and
+   **fix the acceptance criteria now**, before any routing (the kit's
+   criteria when a kit exists). Contested terms go through
+   `cognitive-alignment` first.
 2. **Task or job?** A single stage → straight to routing. A multi-stage
    job (a data dependency or parallelism between stages) → **plan**
    (`squad-plan`): decompose into a DAG of nodes (kit × cost tier ×
@@ -131,19 +166,22 @@ for dependents.
 ## Two power configurations (who is the smart node?)
 
 The lead has **two separable roles** — *router/decomposer* and
-*verifier* — and they need not be equally powerful:
+*verifier* — and they need not be equally powerful. The caller picks
+which configuration runs with the **`lead` mode flag** (above); unset
+defaults to `powerful`.
 
-- **Situation 1 (default).** Powerful lead, modest kit-matched members.
-  The lead's judgment is the verifier; verify depth scales up for weaker
-  members. The endorsed shape.
-- **Situation 2 (guarded).** A common (cheap) lead commanding powerful
-  members. Legal only when verification is moved *off the lead* onto
-  something objective: a **deterministic results oracle** for verifiable
-  output, or a sub-`ship` **cross-vendor cross-validate** filter for
-  judgment output. A `ship`-stakes judgment node with no oracle is
-  illegal — its verify step must escalate to a powerful judge.
-  `squad-plan` declares the job's verifier posture and **blocks** an
-  unguarded frontier judgment node at plan time.
+- **Situation 1 — `lead=powerful` (default).** Powerful lead, modest
+  kit-matched members. The lead's judgment is the verifier; verify depth
+  scales up for weaker members. The endorsed shape.
+- **Situation 2 — `lead=common`.** A common (cheap) lead commanding
+  powerful members. Legal only when verification is moved *off the lead*
+  onto something objective: a **deterministic results oracle** for
+  verifiable output, or a sub-`ship` **cross-vendor cross-validate**
+  filter for judgment output. A `ship`-stakes judgment node with no
+  oracle is illegal — its verify step must escalate to a powerful judge
+  (surfaced as a cost the caller accepts). `squad-plan` carries the
+  flag into the plan header and **blocks** an unguarded frontier judgment
+  node at plan time.
 
 The rule that governs both: **the generator can be anything, but the
 verifier's required power is fixed by the task class** (verifiable →
