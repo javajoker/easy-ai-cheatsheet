@@ -99,12 +99,14 @@ conducted end to end:
    for job nodes the payload is the kit brief + **hydrated state** (only
    the declared ledger keys — never history). Returns are
    schema-validated and quarantined.
-5. **Verify** (`squad-verify`) — the gate ladder: deterministic checks
-   first (free), in-house judgment only where machines can't decide.
-   Against the Phase-1 criteria. PASS → integrate / merge the delta. On
-   PARTIAL/FAIL, drive the escalation ladder: one retry with named gaps
-   → next-ranked member → in-house. Salvage verified-good portions when
-   escalating — never pay twice for the same passing work.
+5. **Verify** (`squad-verify`) — the gate ladder: schema → deterministic
+   results oracle → cross-validate (cross-vendor, signal-only) →
+   in-house judgment, settling each criterion on the cheapest rung that
+   can decide it. Against the Phase-1 criteria. PASS → integrate / merge
+   the delta. On PARTIAL/FAIL, drive the escalation ladder: one retry
+   with named gaps → next-ranked member → in-house. Salvage
+   verified-good portions when escalating — never pay twice for the same
+   passing work.
 6. **Close.** Ledger entry; for jobs, reconcile the job budget and
    distill recurring shapes into `docs/squad/playbook/`; rating-feedback
    proposal if the outcome contradicts the roster; a `memory-ontology`
@@ -126,11 +128,38 @@ merges its own verified delta. Keep the *gates* sequential where a node
 depends on an upstream verified key — parallelism is for siblings, not
 for dependents.
 
+## Two power configurations (who is the smart node?)
+
+The lead has **two separable roles** — *router/decomposer* and
+*verifier* — and they need not be equally powerful:
+
+- **Situation 1 (default).** Powerful lead, modest kit-matched members.
+  The lead's judgment is the verifier; verify depth scales up for weaker
+  members. The endorsed shape.
+- **Situation 2 (guarded).** A common (cheap) lead commanding powerful
+  members. Legal only when verification is moved *off the lead* onto
+  something objective: a **deterministic results oracle** for verifiable
+  output, or a sub-`ship` **cross-vendor cross-validate** filter for
+  judgment output. A `ship`-stakes judgment node with no oracle is
+  illegal — its verify step must escalate to a powerful judge.
+  `squad-plan` declares the job's verifier posture and **blocks** an
+  unguarded frontier judgment node at plan time.
+
+The rule that governs both: **the generator can be anything, but the
+verifier's required power is fixed by the task class** (verifiable →
+oracle suffices; judgment-at-stakes → powerful judge required). See
+[`../README.md`](../README.md) "Lead–member power configurations".
+
 ## Anti-patterns
 
-- **Outsourcing the verification.** Asking a member to verify its own (or
-  another member's) work defeats the layer. Verification is in-house,
-  always.
+- **Consensus as a certificate.** "The members agreed" is a signal, not
+  a verdict — they can share a blind spot. At `ship` stakes, agreement
+  escalates to an oracle or a powerful judge; it never passes alone.
+- **Common lead on a ship-stakes judgment call.** Letting a cheap
+  verifier sign off on a powerful member's prose/semantics at `ship`
+  stakes with nothing objective behind it. The verifier's required power
+  is set by the task class — escalate that verify step to a powerful
+  judge (or `squad-plan` blocks the node).
 - **Context-dump dispatches.** If the prompt needs three pages of session
   background, the task wasn't cold-startable — keep it in-house.
 - **Routing on reputation.** "Member X is supposed to be great at this"

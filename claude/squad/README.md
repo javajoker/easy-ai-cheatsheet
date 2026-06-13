@@ -65,7 +65,7 @@ squad/
 ├── squad-plan/                # skill — decompose a job into a DAG of nodes (kit × tier × gate)
 ├── squad-route/               # skill — pick the member for a task/node (rating × cost × risk)
 ├── squad-dispatch/            # skill — controlled invocation (budget, timeout, sandbox, transcript)
-├── squad-verify/              # skill — gate ladder: schema → deterministic → in-house judgment
+├── squad-verify/              # skill — gate ladder: schema → deterministic oracle → cross-validate → in-house judgment
 ├── squad-state/               # skill — the State Ledger: shared status/memory across members & modalities
 ├── kits/                      # packaged skills (KIT.md per kit) — the unit of fine-grained evaluation
 │   └── README.md              # the KIT.md contract + template
@@ -99,7 +99,7 @@ Three pillars, shared member sheets and kits as workers:
 | **Execute** | `squad-plan` | Decompose a multi-stage job into a DAG of nodes (kit × cost tier × gate); budget + 80% circuit breaker; late member binding. |
 | | `squad-route` | Pick the cheapest member that clears the bar for this task/node (kit rating first; cost × risk × data sensitivity). |
 | | `squad-dispatch` | Invoke the member through its invocation contract, under budget cap + timeout + sandbox; hydrated payloads; capture the transcript. |
-| | `squad-verify` | The gate ladder (schema → deterministic → in-house judgment) before integration; drives the escalation ladder; feeds ratings back. |
+| | `squad-verify` | The gate ladder (schema → deterministic oracle → cross-validate → in-house judgment) before integration; drives the escalation ladder; feeds ratings back. |
 | | `squad-state` | The State Ledger — shared status/memory across members, models, and modalities; hydration + verified-delta merges. |
 
 All ten skills read the same sheets under [`members/`](members/), the
@@ -136,13 +136,15 @@ inventing new discipline:
    *subject to* the quality bar — never quality-blind cost-chasing, never
    cost-blind "use the best." Try-cheap-first: draft low, escalate only
    what fails its gate.
-4. **No silent integration.** Every external output passes `squad-verify`
-   before it touches the repo or merges into the State Ledger, and the
-   verification report names its evidence. The gate ladder spends the
-   cheapest sufficient check first — schema, then deterministic
-   (compiler/tests/diff), then in-house judgment — and judgment runs
-   in-house (Claude), the one place the layer *spends* premium tokens by
-   design.
+4. **No silent integration; assurance is bounded by the verifier.**
+   Every external output passes `squad-verify` before it touches the repo
+   or merges into the State Ledger, and the report names its evidence.
+   The gate ladder spends the cheapest sufficient check first — schema,
+   then a deterministic **results oracle** (compiler/tests/diff), then
+   **cross-validate** (cross-vendor, signal-only), then **in-house
+   judgment**. Consensus is a filter, never a certificate; no member ever
+   self-certifies into the repo. The verifier's *required* power is set
+   by the task class, not chosen — see the configurations below.
 5. **Structured handoffs, not chat.** Members never inherit
    conversational history; they receive hydrated payloads (only the
    ledger keys their node declares) and return schema-checked deltas.
@@ -156,6 +158,47 @@ inventing new discipline:
    breaker. Ratings move on evidence — two verified failures demote;
    sustained passes promote — always through a diff-previewed roster
    edit; successful job plans distill into a reusable playbook.
+
+## Lead–member power configurations
+
+Who is the smart node — the lead or the members? The layer supports both
+arrangements, with different guardrails. The invariant underneath both:
+**assurance is bounded by the verifier, not the generator** (discipline
+4), so the question is always *what is verifying the output*.
+
+| | **Situation 1 (endorsed default)** | **Situation 2 (supported, guarded)** |
+|---|---|---|
+| Lead / verifier | powerful (in-house premium Claude) | common (a cheaper conductor) |
+| Members | modest, **kit-matched to each task** | the most powerful (frontier tier) |
+| Verification | in-house judgment, depth scaled to member rating | a **deterministic results oracle**, or a sub-`ship` cross-validate filter |
+| Cost shape | premium spent on routing + verify; generation cheap | members are the expensive part; little saved on the lead |
+| Sound when | always — it's the core design | a results oracle (or low-stakes cross-vendor filter) carries the decision |
+| Unsound when | — | a `ship`-stakes **judgment-output** node has no oracle (consensus hides correlated error) |
+
+**Situation 1** is the framework's happy path: a powerful lead spends its
+judgment where it's leveraged (decompose, route, verify) while modest but
+*suitable* members — picked by kit rating — do the bulk, re-checked
+harder the weaker they are.
+
+**Situation 2** — a common lead commanding powerful members — is legal
+because the framework can move verification off the lead and onto
+something objective. It is sound exactly when:
+
+- the output is **verifiable** (code/data/runnable) → a generator-
+  independent, trap-covered **results oracle** certifies it (blackbox,
+  results-oriented — the oracle's power bounds assurance, not the lead's);
+  or
+- the output is **judgment** but sub-`ship` → a **cross-vendor
+  cross-validate** filter passes high agreement and escalates the rest.
+
+It is **unsound** — and blocked at plan time by `squad-plan`'s
+Situation-2 guard — when a `ship`-stakes judgment call has no oracle and
+leans on a weak verifier or on raw consensus. There the verify step must
+escalate to a powerful judge: you can make the *generator* anything, but
+the *verifier's required power is fixed by the task class*. The two
+enforcement points are `squad-plan` (the guard, at plan time) and
+`squad-verify` (the gate ladder + the verifier-power table, at verify
+time).
 
 ## Pointers
 

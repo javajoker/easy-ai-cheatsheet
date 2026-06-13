@@ -38,7 +38,7 @@ compounding tokens.
 |---|---|---|---|
 | **0 — Membership** | `member-onboard`, before first invocation | The MEMBER.md draft: invocation contract, cost band, and especially the data-handling section (starts BLOCKED). | Always ask. |
 | **1 — Eval spec** | `eval-design`, before any eval spend | The golden task set + rubric (= the kit's acceptance criteria when a kit exists). Bad rubric = worthless ratings. | Always ask. |
-| **2 — Routing / plan** | `squad-route` per task; `squad-plan` per job | The routing decision (member, rationale, estimated cost, fallback) — or for jobs, the whole plan: nodes, tiers, budget, breaker. | Auto-proceed below the budget threshold in `ROSTER.md`; ask above it, ask always for sensitive data or `stakes: ship`. |
+| **2 — Routing / plan** | `squad-route` per task; `squad-plan` per job | The routing decision (member, rationale, estimated cost, fallback) — or for jobs, the whole plan: verifier posture, nodes, tiers, gate kinds, budget, breaker. A plan failing the Situation-2 guard never reaches this gate. | Auto-proceed below the budget threshold in `ROSTER.md`; ask above it, ask always for sensitive data or `stakes: ship`. |
 | **3 — Integration** | `squad-verify`, after dispatch | Nothing integrates (and no delta merges into the State Ledger) without a PASS. PARTIAL integrates only with gaps explicitly accepted. Quarantined deltas are readable/editable before the decision — the Glass Box. | Always enforced; report always shown. |
 | **4 — Roster movement** | `eval-run` / rating feedback | Any rating or status change, as a diff preview (the `skill-merge` discipline). | Always ask. |
 
@@ -114,13 +114,18 @@ entries.
    transcript. Returns are schema-validated on arrival (free,
    deterministic) and land **quarantined**.
 5. **Verify** (`squad-verify`) — the **gate ladder**, cheapest first:
-   schema (already done) → **deterministic** checks (run the code, diff
-   the output, grep the invariant — free; if a compiler can decide it,
-   no LLM is asked) → **in-house judgment** (premium, reserved for what
-   machines can't decide). PASS → merge the delta / integrate.
-   PARTIAL/FAIL → the escalation ladder: **one** retry with named gaps
-   → next-ranked member → in-house. Never more than one retry to the
-   same member on the same node. Gate 3.
+   schema (already done) → **deterministic** results oracle (run the
+   code, run the tests, diff the artifact, grep the invariant — free; if
+   a compiler can decide it, no LLM is asked) → **cross-validate**
+   (≥2 cross-vendor members compared — signal only: passes low-stakes
+   agreement, escalates disagreement or `ship` stakes) → **in-house
+   judgment** (premium, the rung of last resort). PASS → merge the delta
+   / integrate. PARTIAL/FAIL → the escalation ladder: **one** retry with
+   named gaps → next-ranked member → in-house. Never more than one retry
+   to the same member on the same node. Gate 3. **The verifier's
+   required power is set by the task class** — a verifiable-output node
+   can be certified by the oracle even under a common lead (Situation 2);
+   a `ship`-stakes judgment node always needs in-house judgment.
 6. **Ledger.** Per dispatch: estimated vs. actual cost, outcome,
    escalations — into `docs/squad/ledger.md`; job ledgers reconcile on
    close. The ledger is the proof the layer pays for itself: the

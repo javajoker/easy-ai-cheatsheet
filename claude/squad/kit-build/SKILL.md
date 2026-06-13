@@ -49,6 +49,16 @@ bounds explicit. Acceptance criteria are written now, in
 rubric (member × kit) and the production verify contract — one
 contract, so eval results predict dispatch results.
 
+**Prefer mechanically-checkable criteria — they are a results oracle.**
+A criterion `squad-verify` can settle by running a test, diffing an
+artifact, or grepping an invariant needs no LLM judgment to certify. The
+more of a kit's criteria are oracle-backed, the lower the verifier power
+the kit demands — and an **oracle-backed kit unlocks common-lead
+routing** (Situation 2: a cheap conductor can safely dispatch the kit to
+a powerful member, because the oracle, not the lead, verifies). A kit
+whose acceptance is pure prose judgment can only be verified by a
+powerful judge; note that limitation in the kit so routing knows.
+
 ### Phase 3 — Write KIT.md + worked example
 
 Fill the template: frontmatter (source + version + task class +

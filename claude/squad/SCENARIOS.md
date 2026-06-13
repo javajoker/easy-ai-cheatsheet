@@ -293,12 +293,18 @@ target is won or lost.
 1. Invoke the [`squad-lead`](squad-lead/AGENT.md) agent; it classifies
    and recognizes a *job* (multi-stage), not a task.
 2. [`squad-plan`](squad-plan/) checks the playbook for a reusable plan,
-   else decomposes the job into a DAG: per node a **kit** (or task
-   class), **target cost tier** (never a member name — members resolve
-   at dispatch time against the live roster), declared **ledger
-   inputs/outputs**, and the **cheapest sufficient gate** (schema →
-   deterministic → in-house). Job budget set; **80% circuit breaker**
-   armed. **Gate 2** covers the plan.
+   else declares the **verifier posture** (`powerful` default, or
+   `common` for a cheap conductor — Situation 2) and decomposes the job
+   into a DAG: per node a **kit** (or task class), **target cost tier**
+   (never a member name — members resolve at dispatch time against the
+   live roster), declared **ledger inputs/outputs**, and the **cheapest
+   sufficient gate** (schema → deterministic oracle → cross-validate →
+   in-house). Under a `common` posture the **Situation-2 guard** fires:
+   a frontier-tier node must carry a deterministic oracle (verifiable
+   output) or a sub-`ship` cross-vendor cross-validate gate (judgment
+   output) — a `ship`-stakes judgment node with neither is a plan error.
+   Job budget set; **80% circuit breaker** armed. **Gate 2** covers the
+   plan (a guard failure never reaches it).
 3. [`squad-state`](squad-state/) opens the ledger
    (`docs/squad/jobs/<job-id>/ledger.json`). All cross-member
    status/memory flows through it: nodes read **hydrated payloads**

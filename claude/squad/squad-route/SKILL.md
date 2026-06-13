@@ -40,10 +40,18 @@ among survivors — cost.
 ### Phase 2 — Sort and choose
 
 Cheapest cost band wins; within a band, the better measured result for
-this task class; still tied → lower measured latency. In-house is the
-choice when no member survives the filter, when the task needs session
-context (cold-start members can't have it), or when the task is so small
-that routing overhead exceeds the work.
+this task class (kit rating first); still tied → lower measured latency.
+In-house is the choice when no member survives the filter, when the task
+needs session context (cold-start members can't have it), or when the
+task is so small that routing overhead exceeds the work.
+
+**Cross-validate gate → select cross-vendor peers.** If the node's gate
+is `cross-validate`, resolve **≥2 eligible members from different
+vendors** (decorrelation is the whole point — two instances of one model
+prove nothing). If only one vendor is eligible, the cross-validate gate
+is not satisfiable: say so, and fall back to the deterministic oracle or
+in-house judgment per `squad-verify`'s ladder. Record all peers in the
+decision.
 
 ### Phase 3 — Record and gate (Gate 2)
 
@@ -83,5 +91,6 @@ where routing pressure actually is.
 |---|---|
 | Executing the decision | `squad-dispatch` |
 | A U pair blocks a route worth unblocking | `eval-design` + `eval-run` |
-| The criteria the route will be judged by | `squad-verify` |
+| The criteria + gate ladder the route will be judged by | `squad-verify` |
+| The node's gate kind + verifier posture that shape eligibility | `squad-plan` |
 | Contested classification terms | `cognitive-alignment` |

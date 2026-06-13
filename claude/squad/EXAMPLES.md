@@ -1,11 +1,13 @@
 # EXAMPLES — worked squad runs
 
-Four worked examples showing the artifacts at each step. Names, scores,
+Five worked examples showing the artifacts at each step. Names, scores,
 and costs below are **illustrative** — your evals produce your numbers.
 Example 1 walks Scenario W (evaluation), Example 2 walks Scenario X
 (routed execution), Example 3 shows the escalation ladder and rating
-feedback doing their jobs, and Example 4 walks Scenario Z (a multi-member
-DAG job with a shared State Ledger).
+feedback doing their jobs, Example 4 walks Scenario Z (a multi-member
+DAG job with a shared State Ledger), and Example 5 shows Situation 2 —
+a common (cheap) lead safely commanding powerful members via a results
+oracle and a cross-validate gate.
 
 ---
 
@@ -225,6 +227,70 @@ pages were inlined into exactly *zero* prompts beyond the 5-page chunks
 n1 needed; the deterministic gate caught the bug for free; premium
 tokens were spent only on routing, the final judgment, and the one fix —
 not on generation or on shuttling history between members.
+
+---
+
+## Example 5 — Situation 2: a common lead commanding powerful members
+
+**Setup.** The conductor is deliberately run on a cheap model (say, to
+orchestrate from a low-cost host) — `verifier: common`. The job routes
+*frontier* members. The question Situation 2 forces: with a weak lead,
+what verifies the powerful members' output? Two job nodes, two answers.
+
+**Job plan header (`squad-plan`):**
+
+```markdown
+# Job plan — 2026-06-13-api-client
+verifier: common          # cheap conductor — the Situation-2 guard is active
+budget: mid band, breaker at 80%
+
+| node | kit | tier | output | gate | guard check |
+|---|---|---|---|---|---|
+| n1 | kit-openapi-client | frontier-reasoning | client_code | deterministic (generated tests + typecheck) | ✅ verifiable output → oracle |
+| n2 | kit-api-overview-doc | frontier-reasoning | overview_md | cross-validate (codex-cli ∥ gemini-cli) | ⚠️ judgment, internal stakes → cross-vendor filter |
+```
+
+**Guard at plan time.** Both nodes route a frontier tier under a *common*
+lead, so `squad-plan`'s Situation-2 guard checks each:
+
+- **n1** produces code — *verifiable*. Its gate is a **deterministic
+  results oracle** (the kit ships a generated test suite + `tsc
+  --noEmit`). Legal ✅ — assurance is bounded by the oracle, not the weak
+  lead. Had n1 carried no oracle, the plan would fail Gate 2.
+- **n2** produces a prose API overview — *judgment*, no oracle exists. It
+  is `internal` stakes (not `ship`), so a **cross-vendor cross-validate**
+  gate is permitted ⚠️. `squad-route` resolves two *different-vendor*
+  peers (codex-cli ∥ gemini-cli) — decorrelation is the point.
+
+**n1 verify (oracle, free).** The frontier member writes the client; the
+sandbox runs the kit's tests and the type-check. 28/28 pass, types
+clean. The common lead doesn't *read* the code — it runs the oracle and
+reads the exit code. **PASS**, delta merged. A weak lead just certified a
+frontier member's output, soundly, because the oracle did the judging.
+
+**n2 verify (cross-validate, signal-only).** Both peers produce an
+overview. The lead diffs them structurally: they agree on every endpoint
+and the auth flow, disagree on one rate-limit number (codex says 100/s,
+gemini says 60/s). **Agreement is a pass-filter; the disagreement
+escalates** — and here's the catch the guard anticipates: at `ship`
+stakes this would force an in-house judge, but at `internal` stakes the
+lead escalates just the one disputed row to the deterministic source
+(greps the rate-limit header in the actual API spec → 60/s, gemini
+right). The agreed remainder passes on consensus; the one conflict was
+resolved by an oracle, not by the weak lead guessing.
+
+**What if n2 had been `ship` stakes?** The guard would have made
+`cross-validate` illegal as the terminal gate — the plan would either
+mark n2 `gate: in-house` (accepting premium verify spend on that one
+node — the verify step reverts to Situation 1) or not pass Gate 2. The
+generator stays frontier; the *verifier* power is dictated by the task,
+not the budget.
+
+**Outcome.** A common lead safely commanded frontier members on both
+nodes — because neither relied on the lead's judgment: n1's oracle and
+n2's cross-vendor filter (with an oracle tie-break) carried the
+decisions. The configuration the framework *blocks* — a weak lead
+rubber-stamping frontier prose at ship stakes — never got past planning.
 
 ---
 

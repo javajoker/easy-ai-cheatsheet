@@ -66,6 +66,15 @@ design: this file records *your* measurements, not anyone's reputation.
 Run Scenario W (see [SCENARIOS.md](SCENARIOS.md)) on the task classes you
 actually want to route.
 
+**Vendor matters for cross-validation.** Each member's `vendor:` (on its
+sheet) is load-bearing for the `cross-validate` gate: that gate needs
+**≥2 eligible members from *different* vendors**, because consensus only
+adds assurance to the extent members fail independently — two models from
+the same vendor (or two tags of one local model) share blind spots and
+their agreement proves little. A roster with members from only one vendor
+cannot satisfy a `cross-validate` gate; routing falls back to a
+deterministic oracle or in-house judgment.
+
 ## The kit matrix (fine-grained — preferred by routing when present)
 
 The class matrix above is coarse: "can this member translate?" The kit
