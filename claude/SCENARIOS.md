@@ -1104,6 +1104,45 @@ whole new role viable. See the maintenance docs above for the rest.
 
 ---
 
+## Scenarios V–Z — Squad Engineering (evaluate / organize / execute across LLM products)
+
+**Goal.** Treat other LLM products (Codex CLI, Gemini CLI, local models
+via Ollama, …) as a managed squad: evaluate each member's capability per
+**special task** — a framework skill packaged as a *kit* — before
+trusting it, organize measured ratings into a roster, and route work to
+the cheapest member that clears the quality bar — dispatched under
+control (sandbox, budget caps, timeouts, deterministic gates) and
+verified in-house before anything integrates. Multi-stage jobs run as a
+DAG sharing a **State Ledger** so status/memory cross members and
+modalities without compounding tokens. The motivation is token cost:
+premium tokens go to routing, verification, and work only Claude can do.
+
+These scenarios have their own self-contained home: the
+[`squad/`](squad/README.md) layer. The canonical playbooks live there:
+
+- **Scenario V — Onboarding a new LLM product** · **W — Evaluating
+  members for a task class / kit** · **X — Routed execution with
+  control** · **Y — Member version change / re-evaluation / retirement**
+  · **Z — Multi-member DAG job with a shared State Ledger**:
+  [`squad/SCENARIOS.md`](squad/SCENARIOS.md)
+- **Everyday mechanics:** [`squad/HOWTO.md`](squad/HOWTO.md) ·
+  **Pipeline + gates:** [`squad/WORKFLOW.md`](squad/WORKFLOW.md) ·
+  **Worked examples:** [`squad/EXAMPLES.md`](squad/EXAMPLES.md) ·
+  **Design sources:** [`squad/references/`](squad/references/README.md)
+
+In one breath: `member-onboard` registers a product with a
+provenance-tagged sheet (everything `(claimed)`, rating U); `kit-build`
+packages a framework skill into a member-portable kit so evaluation
+measures *member × special task*; `eval-design` + `eval-run` turn golden
+tasks into `(measured)` ratings on `squad/ROSTER.md`; the `squad-lead`
+agent then conducts (for jobs) `squad-plan` → per node
+`squad-route` → `squad-dispatch` → `squad-verify`, sharing state through
+`squad-state`, with five human gates and a cost ledger; `member-retune`
+keeps the evidence honest when the products move. See the squad docs
+above for the rest.
+
+---
+
 ## Appendix — Checklists
 
 Aggregated quick-reference of which skills exist (✓), which are project-specific
@@ -1400,6 +1439,7 @@ first; the framework refuses to spec features against an un-onboarded project.
 - [HOWTO.md](HOWTO.md) — everyday mechanics.
 - [agents/README.md](agents/README.md) — agents layer overview.
 - [agents/CHECKLIST.md](agents/CHECKLIST.md) — agents + new-skills progress.
+- [squad/SCENARIOS.md](squad/SCENARIOS.md) — Scenarios V–Z (Squad Engineering).
 - `INSTRUCTIONS/README.md` — universal instructions overview.
 - `skills/ideas/WORKFLOW.md` — the project quick-start narrative.
 - `skills/share/skill-orchestrator/SKILL.md` — orchestration logic.
