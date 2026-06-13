@@ -96,6 +96,39 @@ The flag sets the *default* posture; the guard may still force a single
 verify step up to a powerful judge in `common` mode (surfaced as a cost
 the caller accepts) — see `squad-plan` and `squad-verify`.
 
+## Two more caller flags: `gate` and `check`
+
+Resolved in the same breath as `lead`, recorded in the same places
+(routing decision / plan header), each defaulting to the safe option when
+unset.
+
+```
+gate  = human | auto        # DEFAULT human — auto runs the tactical gates unattended; strategic floors still pause
+check = default | <name>    # DEFAULT default — or a registered third-party check (a member in the verifier role)
+```
+
+- **`gate`** switches the five gates between human approval (default) and
+  unattended auto-proceed. `auto` automates the **tactical** tier only;
+  the **strategic floor** — clearing data-handling (Gate 0); `sensitive`
+  data / `ship` stakes / over-budget routing (Gate 2); integrating
+  PARTIAL/FAIL at `ship` (Gate 3); promotion to A (Gate 4) — **always
+  pauses for a human**, even under `auto`. Auto is unattended, never
+  unlogged: every auto decision still lands in the records. When the
+  caller asks for `auto` on work that hits a strategic floor, honor the
+  floor and say which gate paused and why.
+- **`check`** selects the verifier: the in-house ladder (default) or a
+  registered check skill/agent. A plugged-in check is governed by
+  `squad-verify`'s verifier-power table and the **independence** rule
+  (different vendor than the generator), runs through `squad-dispatch`
+  like any member, and is backstopped by in-house. It fills a rung; it
+  never raises a generator's ceiling, and it never self-certifies into
+  the repo. Resolve `check=<name>` against the roster's verifier-role
+  members; an unrated or non-independent check is refused and the verify
+  falls back to default.
+
+When any flag's intent is ambiguous, confirm rather than assume the
+riskier option (`auto`, or a weak custom `check`).
+
 ## When to fire
 
 Fire when:
@@ -120,13 +153,14 @@ Do **not** fire when:
 The execute loop from [`../WORKFLOW.md`](../WORKFLOW.md) Phase 4,
 conducted end to end:
 
-1. **Resolve the `lead` flag, then classify.** Read the caller's `lead`
-   mode (default `powerful` if unset — see the flag section above); carry
-   it as the request's verifier posture. Then classify: task class (or
-   kit), stakes (`throwaway`/`internal`/`ship`), data sensitivity — and
-   **fix the acceptance criteria now**, before any routing (the kit's
-   criteria when a kit exists). Contested terms go through
-   `cognitive-alignment` first.
+1. **Resolve the flags (`lead`, `gate`, `check`), then classify.** Read
+   the caller's `lead` mode (default `powerful`), `gate` mode (default
+   `human`), and `check` (default `default`) — see the flag sections
+   above; carry them as the request's verifier posture, approval mode,
+   and verifier identity. Then classify: task class (or kit), stakes
+   (`throwaway`/`internal`/`ship`), data sensitivity — and **fix the
+   acceptance criteria now**, before any routing (the kit's criteria when
+   a kit exists). Contested terms go through `cognitive-alignment` first.
 2. **Task or job?** A single stage → straight to routing. A multi-stage
    job (a data dependency or parallelism between stages) → **plan**
    (`squad-plan`): decompose into a DAG of nodes (kit × cost tier ×
@@ -222,6 +256,14 @@ oracle suffices; judgment-at-stakes → powerful judge required). See
 - **Untaxed savings.** A "win" computed as member-band vs. in-house, with
   the lead's own routing + verify tokens left out, isn't a win — it's an
   accounting error. Report all-in vs. baseline.
+- **`auto` over the strategic floor.** `gate=auto` automates the tactical
+  tier, not the strategic one. Auto-clearing data-handling, auto-shipping
+  a PARTIAL, auto-promoting to A, or auto-spending past the cap because
+  "the caller said auto" is the floor being ignored — pause and say which
+  gate held.
+- **Trusting an unvetted custom check.** A `check=<name>` that is unrated,
+  or shares the generator's vendor, is not a verifier — it's self-grading
+  by proxy. Refuse it and fall back to the in-house ladder.
 
 ## Deliverable contract
 

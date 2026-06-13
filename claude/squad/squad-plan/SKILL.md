@@ -39,7 +39,13 @@ legal:
 Record the inherited posture in the plan header (`lead: powerful|common`);
 it is the precondition the Phase-1 guard checks every node against. If
 the caller set no flag, the header reads `lead: powerful` — never leave
-it implicit.
+it implicit. Record the other two caller flags in the header too:
+**`gate-mode: human|auto`** (the approval mode for this job's gates —
+`human` if unset; named `gate-mode` to avoid colliding with each node's
+`gate` *rung*) and **`check: default|<name>`** (the verifier — in-house
+ladder if unset; a node may override with its own check). All three are
+explicit in the header so every dispatch record shows the regime it ran
+under.
 
 ### Phase 1 — Decompose into nodes
 
@@ -145,13 +151,17 @@ finding for the playbook, not a failure.
 ### Phase 4 — Record, gate, open
 
 Write `docs/squad/jobs/<job-id>/plan.md` — the **verifier posture**, the
-node table (with each node's tier + gate kind), the DAG (Mermaid), and
-the budget — and open the ledger via `squad-state`. **Gate 2 applies to
-the plan as a whole**: jobs above the budget threshold, touching
-sensitive data, or at `ship` stakes get explicit approval before node 1
-dispatches. A plan that fails the Situation-2 guard (a `common`-verifier
-job with an unguarded frontier judgment node) does **not** reach Gate 2
-— fix the gate or the posture first.
+**gate mode + check**, the node table (with each node's tier + gate
+kind), the DAG (Mermaid), and the budget — and open the ledger via
+`squad-state`. **Gate 2 applies to the plan as a whole**: jobs above the
+budget threshold, touching sensitive data, or at `ship` stakes get
+explicit approval before node 1 dispatches. Under **`gate=auto`** the
+plan auto-proceeds *below the strategic floor* (recorded, not silent);
+the floor — over-budget, `sensitive` data, `ship` stakes — still pauses
+for a human, and during the DAG walk a `ship`-stakes PARTIAL/FAIL still
+surfaces even unattended. A plan that fails the Situation-2 guard (a
+`common`-verifier job with an unguarded frontier judgment node) does
+**not** reach Gate 2 — fix the gate or the posture first.
 
 ### Phase 5 — Hand off to the loop
 

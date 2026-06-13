@@ -121,6 +121,39 @@ under `common` will be flagged and either escalated to a powerful judge
 (you accept the spend) or declined. Unsure which to use? Omit the flag —
 `powerful` is always correct, just not always cheapest.
 
+## Choosing the gate mode and the check (two more switches)
+
+Two more caller flags, same shape as `lead` — omit either for its safe
+default:
+
+```
+gate  = human | auto        # human (default): gates ask. auto: gates run unattended.
+check = default | <name>    # default (in-house ladder), or your own registered check.
+```
+
+```
+> Squad this and run it unattended — gate=auto.
+> Translate these 40 files, auto-approve the routine gates.
+> Verify the generated client with check=my-oss-linter.
+> Use codex-cli to draft and gemini-cli as the check.        (check = a different vendor)
+```
+
+- **`gate=auto`** removes the approval click on the **tactical** tier
+  (eval specs, routine sub-`ship` routes under cap, PASS integrations,
+  demotions). It **never** removes it on the **strategic floor**:
+  clearing what data may leave in-house, `sensitive`/`ship`/over-cap
+  routes, shipping a PARTIAL/FAIL at `ship`, or promoting to A always
+  pause for you. Auto is unattended bulk throughput, not a blank cheque —
+  and every auto decision is still written to the records.
+- **`check=<name>`** points the verifier at a registered check (an
+  oracle, an open-source checker, another vendor's review agent) instead
+  of the in-house ladder. It must be **a different vendor than the
+  member it checks** (a same-model check is self-grading) and rated as a
+  verifier; it runs under the same dispatch control as any member and
+  **falls back to in-house** if it errors or is too weak for the stakes.
+  A custom check fills a rung — it never lets a weak generator ship
+  `ship`-stakes judgment on the check's say-so alone.
+
 ## Executing a task through the squad
 
 ```

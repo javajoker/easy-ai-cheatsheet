@@ -33,6 +33,7 @@ interface: cli | api | mcp
 status: probation            # mirrors ROSTER.md; roster wins on conflict
 cost_band: free | low | mid | premium
 data_handling: BLOCKED       # BLOCKED | cleared: public | cleared: internal | cleared: sensitive
+roles: [generator]           # generator | verifier (a check). A member can be both.
 evaluated: []                # ["<task-class>@<member-version>", ...] — set by eval-run
 member_version: <model/CLI version the evidence below is anchored on>
 ---
@@ -76,6 +77,24 @@ refuses to send a data class this section doesn't clear.
 | Date | Task class | Scorecard | Outcome |
 |---|---|---|---|
 ```
+
+## The verifier role (a member as a check)
+
+A member can serve not just as a **generator** (does the work) but as a
+**verifier** — a *check* a caller selects with `check=<name>`
+(`squad-verify`). Mark it in `roles:` and rate it as a verifier the same
+way you rate a generator: an eval that asks *does this check catch the
+trap rows?* The rules that make a plugged-in check safe live in
+`squad-verify`, but two bind the sheet:
+
+- **Independence is per-route, not a property of the sheet.** A check is
+  only valid where it is a *different vendor than the generator it's
+  checking* — `squad-route` enforces that pairing. A check sharing the
+  generator's model is self-grading.
+- **A verifier rating is separate evidence.** "Good at generating code"
+  does not imply "good at catching code bugs." Rate the verifier role on
+  its own scorecard before `check=<name>` may certify at stakes; until
+  then it is U-as-verifier and adds signal only.
 
 ## Disciplines
 

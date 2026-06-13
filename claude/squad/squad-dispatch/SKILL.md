@@ -15,7 +15,11 @@ skill** (that's `squad-verify`'s gate).
 ### Phase 0 — Preconditions
 
 - A routing decision names the member (or this is an `eval-run` golden
-  task / `member-onboard` smoke test — those carry their own context).
+  task / `member-onboard` smoke test / a `squad-verify` **check
+  invocation** — those carry their own context). A check runs under the
+  same control as any member (sandbox, caps, transcript); if it errors or
+  times out, the dispatch is recorded as a failure and `squad-verify`
+  fails it **open** to the in-house ladder.
 - The member's `MEMBER.md` invocation contract exists and was
   smoke-tested.
 - The **input allowlist** is explicit: exactly the files/content the task

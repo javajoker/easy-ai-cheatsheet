@@ -34,13 +34,18 @@ compounding tokens.
 
 ## The five gates
 
-| Gate | Where | What a human approves | Default |
-|---|---|---|---|
-| **0 — Membership** | `member-onboard`, before first invocation | The MEMBER.md draft: invocation contract, cost band, and especially the data-handling section (starts BLOCKED). | Always ask. |
-| **1 — Eval spec** | `eval-design`, before any eval spend | The golden task set + rubric (= the kit's acceptance criteria when a kit exists). Bad rubric = worthless ratings. | Always ask. |
-| **2 — Routing / plan** | `squad-route` per task; `squad-plan` per job | The routing decision (member, rationale, estimated cost, fallback) — or for jobs, the whole plan: verifier posture, nodes, tiers, gate kinds, budget, breaker. A plan failing the Situation-2 guard never reaches this gate. | Auto-proceed below the budget threshold in `ROSTER.md`; ask above it, ask always for sensitive data or `stakes: ship`. |
-| **3 — Integration** | `squad-verify`, after dispatch | Nothing integrates (and no delta merges into the State Ledger) without a PASS. PARTIAL integrates only with gaps explicitly accepted. Quarantined deltas are readable/editable before the decision — the Glass Box. | Always enforced; report always shown. |
-| **4 — Roster movement** | `eval-run` / rating feedback | Any rating or status change, as a diff preview (the `skill-merge` discipline). | Always ask. |
+The **`gate` flag** (`human` default / `auto`) sets the approval mode.
+`auto` automates the **tactical** tier; the **strategic floor** in the
+last column always pauses for a human even under `auto`. Either way, the
+record is written — `auto` is unattended, not unlogged.
+
+| Gate | Where | What a human approves | Under `gate=human` (default) | Under `gate=auto` (strategic floor still pauses) |
+|---|---|---|---|---|
+| **0 — Membership** | `member-onboard`, before first invocation | The MEMBER.md draft: invocation contract, cost band, and especially the data-handling section (starts BLOCKED). | Always ask. | Onboard auto; **clearing/widening data-handling always pauses**. |
+| **1 — Eval spec** | `eval-design`, before any eval spend | The golden task set + rubric (= the kit's acceptance criteria when a kit exists). Bad rubric = worthless ratings. | Always ask. | Auto-proceed (spec + cost recorded). |
+| **2 — Routing / plan** | `squad-route` per task; `squad-plan` per job | The routing decision (member, rationale, estimated cost, fallback) — or for jobs, the whole plan: verifier posture, nodes, tiers, gate kinds, budget, breaker. A plan failing the Situation-2 guard never reaches this gate. | Auto-proceed below the budget threshold in `ROSTER.md`; ask above it, ask always for sensitive data or `stakes: ship`. | Auto-proceed under cap; **`sensitive` data, `ship` stakes, or over-cap always pauses**. |
+| **3 — Integration** | `squad-verify`, after dispatch | Nothing integrates (and no delta merges into the State Ledger) without a PASS. PARTIAL integrates only with gaps explicitly accepted. Quarantined deltas are readable/editable before the decision — the Glass Box. | Always enforced; PASS integrates, PARTIAL asks. | PASS integrates; **PARTIAL/FAIL at `ship` stakes always pauses**. |
+| **4 — Roster movement** | `eval-run` / rating feedback | Any rating or status change, as a diff preview (the `skill-merge` discipline). | Always ask. | Demotions auto-apply (recorded); **promotion to A always pauses**. |
 
 ## Phase by phase
 

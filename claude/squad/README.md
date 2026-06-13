@@ -196,6 +196,80 @@ other — a brilliant member with no clearance for the data stays
 in-house, and a cleared member with a U rating takes nothing that
 matters.
 
+## The `gate` flag — auto or human approval
+
+The five gates pause for a human by default. The **`gate` flag** lets the
+caller run them unattended — but only along the line the governance tiers
+already draw: **`auto` automates the *tactical* tier; the *strategic*
+tier always pauses, regardless of the flag.**
+
+```
+gate = human   # DEFAULT — every gate pauses for approval as documented
+gate = auto    # tactical gates auto-proceed (recorded, not silent); strategic floors still pause
+```
+
+Set it like `lead` — a flag (`gate=auto`) or plain language ("run it
+unattended", "auto-approve the gates"). `squad-lead` resolves it, records
+it (`gate-mode:` in the routing decision / plan header — named to avoid
+colliding with a node's `gate` *rung*), and each gate honors it. **Unset
+means `human`** — the safe default; the lead never goes unattended on its
+own.
+
+What `auto` may decide on its own (tactical): the eval spec (Gate 1), a
+sub-`ship` route under the budget cap (Gate 2), a PASS integration
+(Gate 3, as today), and a roster **demotion** (Gate 4 — removing trust is
+conservative). What **always** pauses even under `auto` (the strategic
+floor):
+
+- **Gate 0** — clearing or widening a member's data-handling clearance.
+  *What data may leave in-house is never an auto decision.*
+- **Gate 2** — `sensitive` data, `ship` stakes, or any estimate **over
+  the budget cap**.
+- **Gate 3** — integrating **PARTIAL/FAIL** output at `ship` stakes.
+- **Gate 4** — a **promotion to A** (granting `ship`-clearing trust).
+
+So `gate=auto` buys unattended bulk throughput without ever letting the
+machine self-grant trust, spend past its cap, or send data a human hasn't
+cleared. Everything `auto` decides is still written to the same records —
+auto is *unattended*, never *unlogged*.
+
+## The `check` flag — the default verifier or a plugged-in one
+
+The verifier is the in-house gate ladder by default. The **`check` flag**
+lets the caller substitute or augment it with a registered third-party
+check — your own oracle, an open-source checker, a different vendor's
+review agent — without weakening the bright line.
+
+```
+check = default        # DEFAULT — the in-house gate ladder (schema → oracle → cross-validate → in-house)
+check = <name>         # a registered check (skill or agent) slotted into the ladder at its earned rung
+```
+
+A plugged-in check is **a member in the verifier role**: it registers and
+rates like any member (its trust is `(measured)`, never `(claimed)`), it
+runs through `squad-dispatch` (sandbox, caps, transcript — an external
+check is still an external call), and four constraints keep it honest:
+
+1. **Independence.** A check must be a *different vendor/instance* than
+   the generator. A check sharing the generator's model is self-grading
+   wearing a plugin's costume — `squad-route` refuses it.
+2. **The verifier-power table still governs.** A check certifies only
+   what its rung earns: a **deterministic** check (runs code/tests —
+   objective) can certify verifiable output (assurance bounded by the
+   check, like any oracle); a **judgment** check is a `cross-validate`
+   signal at sub-`ship` and **escalates** at `ship`. A custom check does
+   not raise a generator's ceiling — it fills a rung.
+3. **In-house is the backstop.** A check that errors, times out, or is
+   unrated falls back to the in-house ladder. A `ship`-stakes judgment
+   call still ends at a powerful judge; a plugged-in checker can stand in
+   only if it is itself trusted at that power and independent.
+4. **It never self-certifies into the repo.** Same Gate 3 as everything
+   else — a check's verdict is a signal feeding the gate, not a merge.
+
+So "bring your own checker" is fully supported, and it is governed by the
+exact rule that governs everything else: **assurance is bounded by the
+verifier's power and independence — whoever the verifier is.**
+
 ## Squad inside a Loop
 
 Squad is the level-5 paradigm that extends **Loop Engineering** (level 4

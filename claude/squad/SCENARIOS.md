@@ -176,13 +176,19 @@ records what it really cost.
 ### Procedure
 
 1. Invoke the [`squad-lead`](squad-lead/AGENT.md) agent ("route this
-   through the squad" — optionally with `lead=common` to run Situation 2;
-   omit the flag for the `powerful` default). It resolves the `lead` mode
-   then **classifies**: task class, stakes
-   (`throwaway`/`internal`/`ship`), data sensitivity — and fixes the
-   acceptance criteria *before* routing. Under `lead=common` the
-   single-task Situation-2 guard applies (verifiable → oracle; sub-`ship`
-   judgment → cross-validate; `ship` judgment → escalate or decline).
+   through the squad"). Three optional flags, each defaulting to the safe
+   option when omitted: `lead=common` (Situation 2; default `powerful`),
+   `gate=auto` (unattended tactical gates; default `human`), and
+   `check=<name>` (a registered third-party verifier; default the
+   in-house ladder). It resolves all three, then **classifies**: task
+   class, stakes (`throwaway`/`internal`/`ship`), data sensitivity — and
+   fixes the acceptance criteria *before* routing. Under `lead=common`
+   the single-task Situation-2 guard applies (verifiable → oracle;
+   sub-`ship` judgment → cross-validate; `ship` judgment → escalate or
+   decline). Under `gate=auto` routine gates proceed unattended but the
+   strategic floor (`sensitive` data, `ship` stakes, over-cap) still
+   pauses; a `check=<name>` is validated for independence + verifier
+   rating or it falls back to the in-house ladder.
 2. [`squad-route`](squad-route/) filters the roster: rating clears the
    stakes bar, data-handling covers the inputs, status allows the work.
    Cheapest eligible band wins. **Gate 2:** the decision (member, why,
