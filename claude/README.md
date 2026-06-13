@@ -1,7 +1,7 @@
 # ai-claude — Claude Code skills + instructions + agents framework
 
 A portable, project-agnostic framework for using Claude Code consistently across
-many projects. It combines three content layers plus a maintenance layer:
+many projects. It combines three content layers plus two meta layers:
 
 - **`INSTRUCTIONS/`** — universal engineering principles and conventions
   always loaded by Claude.
@@ -13,6 +13,14 @@ many projects. It combines three content layers plus a maintenance layer:
 - **`maintenance/`** — the framework's self-tuning layer: skills that retune
   the three layers above to a new Claude model or Claude Code harness version
   (Scenario U). See [`maintenance/README.md`](maintenance/README.md).
+- **`squad/`** — Squad Engineering, the executor axis: evaluate, organize,
+  and dispatch *other* LLM products (Codex CLI, Gemini CLI, local models)
+  under control, so premium tokens go only to routing, verification, and
+  work only Claude can do (Scenarios V–Z). Evaluation is per **special
+  task** via *kits* (a framework skill packaged with a wire contract);
+  multi-member jobs share a **State Ledger** so status/memory cross
+  models and modalities without compounding tokens. See
+  [`squad/README.md`](squad/README.md).
 
 The framework is **English-first** so the model can maintain it uniformly.
 Project output (code, docs, user-facing copy, conversational restate phrases)
@@ -55,6 +63,17 @@ claude/
 │       ├── tune-for-opus-4-7/      # Opus 4.7 capability lens
 │       ├── tune-for-opus-4-8/      # Opus 4.8 capability lens
 │       └── tune-for-cc-harness/    # current CC harness capability lens
+├── squad/                          # Squad Engineering — evaluate/organize/execute across LLM products (Scenarios V–Z)
+│   ├── README.md                   # layer overview + the seven disciplines
+│   ├── HOWTO.md / WORKFLOW.md / SCENARIOS.md / EXAMPLES.md
+│   ├── ROSTER.md                   # member × task-class + member × kit rating matrix (routing truth)
+│   ├── squad-lead/                 # conductor agent — classify → plan? → route → dispatch → verify → ledger
+│   ├── member-onboard/  member-retune/                      # organize pillar
+│   ├── kit-build/  eval-design/  eval-run/                  # evaluate pillar (kit-build packages a skill for members)
+│   ├── squad-plan/  squad-route/  squad-dispatch/  squad-verify/  squad-state/  # execute pillar (+ State Ledger)
+│   ├── kits/                        # packaged skills (KIT.md) — the unit of fine-grained evaluation
+│   ├── references/                 # attached design docs + concept → implementation map
+│   └── members/                    # per-product sheets (claude-code, codex-cli, gemini-cli, ollama-local)
 └── skills/
     ├── share/                      # cross-cutting meta-skills
     │   ├── skill-orchestrator/     # picks and chains skills for multi-step tasks
@@ -103,6 +122,7 @@ under `skills/projects/<slug>/`, created on demand — see HOWTO.md
 | Group | Skills |
 |---|---|
 | `maintenance/` | 8 |
+| `squad/` | 10 |
 | `share/` | 8 |
 | `ideas/` | 12 |
 | `dev-go/` | 20 |
@@ -117,11 +137,12 @@ under `skills/projects/<slug>/`, created on demand — see HOWTO.md
 | `scenario/` | 4 |
 | `devops/` | 7 |
 | `enterprise-kb/` | 5 |
-| **Total** | **145** (all shipped) |
+| **Total** | **155** (all shipped) |
 
 | Agents | Count |
 |---|---|
 | `agents/` | 6 |
+| `squad/squad-lead` (lives in the squad layer) | 1 |
 
 Plus 13 portable instruction files under `INSTRUCTIONS/` and 2 templates.
 
@@ -156,6 +177,10 @@ Plus 13 portable instruction files under `INSTRUCTIONS/` and 2 templates.
   `skills/share/requirement-audit/references/audit-template.md`.
 - **Adding a new scenario or asking what skills a workflow will use?**
   Run `scenario-checklist`.
+- **Want cheaper LLM products to take the bulk work?** See the squad
+  layer — [`squad/README.md`](squad/README.md): evaluate members first
+  (Scenario W), then route with control (Scenario X). The roster of who
+  can do what is [`squad/ROSTER.md`](squad/ROSTER.md).
 - **Captured a "this skill should be sharper" observation during live
   work?** Run `skill-evolution` to write a proposal, then `skill-merge`
   to apply it when ready. See `HOWTO.md` "Evolving a skill through use".
@@ -177,6 +202,11 @@ human-checkpointed loops for staying current:
   [`maintenance/HOWTO.md`](maintenance/HOWTO.md) for the mechanics and
   [`maintenance/SCENARIO-U.md`](maintenance/SCENARIO-U.md) for the full
   playbook.
+- **Squad roster upkeep** (executor-driven). The squad layer's measured
+  ratings of other LLM products decay as those products ship new versions
+  or change terms; `member-retune` (under [`squad/`](squad/README.md))
+  flags stale evidence, re-gates data-handling, and queues targeted
+  re-evals — same diff-previewed, human-checkpointed apply.
 
 ## License and authorship
 

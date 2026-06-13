@@ -1,8 +1,8 @@
 # ai-claude — Claude Code skills + instructions + agents framework
 
 A portable, project-agnostic framework for using Claude Code consistently
-across many projects. It combines three content layers plus a maintenance
-layer:
+across many projects. It combines three content layers plus two meta
+layers (maintenance and squad):
 
 - **`claude/INSTRUCTIONS/`** — universal engineering principles and
   conventions, always loaded.
@@ -12,6 +12,12 @@ layer:
   skills, and a deliverable contract for a specific job.
 - **`claude/maintenance/`** — the framework's self-tuning layer: skills that
   retune the three layers above to a new Claude model or harness version.
+- **`claude/squad/`** — Squad Engineering: evaluate, organize, and dispatch
+  *other* LLM products (Codex CLI, Gemini CLI, local models) under control,
+  saving premium tokens for the work only Claude should do. Evaluates each
+  product per *special task* (a framework skill packaged as a kit), and
+  shares status/memory across members and modalities through a State
+  Ledger so multi-model jobs don't compound tokens.
 
 Everything lives under [`claude/`](claude/). Start there:
 
